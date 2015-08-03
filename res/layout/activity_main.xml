@@ -40,13 +40,14 @@
              android:layout_width="fill_parent"
              android:layout_height="wrap_content"
              android:orientation="horizontal" >
-
+
              <ProgressBar
                  android:id="@+id/progressBar1"
                  style="?android:attr/progressBarStyleHorizontal"
                  android:layout_width="wrap_content"
                  android:layout_height="5dp"
-                 android:layout_weight="0.8" />
+                 android:layout_weight="0.61" />
+
          </LinearLayout>
 
         <LinearLayout
@@ -56,21 +57,21 @@
             android:paddingTop="10dp">
 
             <ImageButton
-                android:id="@+id/button3"
+                android:id="@+id/btnpre"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/pre"
                 android:layout_marginLeft="60dp"
                  />
               <ImageButton
-                android:id="@+id/button3"
+                android:id="@+id/btnplay"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/play"
                 android:layout_marginLeft="15dp"
                  />
                 <ImageButton
-                android:id="@+id/button3"
+                android:id="@+id/btnnext"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:background="@drawable/next"
