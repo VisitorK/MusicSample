@@ -48,6 +48,14 @@ public class MainActivity extends Activity {
 				
 			}
 		});
+        ImageButton btn1=(ImageButton)findViewById(R.id.btnnext);
+        btn1.setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+			startActivity(new Intent(MainActivity.this, MusicListActivity.class));
+				
+			}
+		});
      
     }
     final ServiceConnection con=new ServiceConnection() {

@@ -19,6 +19,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+           <activity
+            android:name=".MusicListActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+           
+        </activity>
          <service android:name="bktmkd.android.services.MusicPlyerService"/>
     </application>
 
