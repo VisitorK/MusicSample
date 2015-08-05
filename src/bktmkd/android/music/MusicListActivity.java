@@ -19,8 +19,10 @@ public class MusicListActivity extends Activity {
 		super.onCreate(savedInstanceState);
 		ListView list=(ListView)findViewById(R.id.listView1);
 
-		SimpleAdapter adapter=new SimpleAdapter(this,getData(), R.layout.item_music,new String[]{"img","title"},new int[]{R.id.img,R.id.title});
-	list.setAdapter(adapter);
+		//SimpleAdapter adapter=new SimpleAdapter(this,getData(), R.layout.item_music,new String[]{"img","title"},new int[]{R.id.img,R.id.title});
+//	list.setAdapter(adapter);
+		MusicBaseAdapter adapter=new MusicBaseAdapter(this);
+		list.setAdapter(adapter);
 	}
 	private List<Map<String,Object>> getData()
 	{
