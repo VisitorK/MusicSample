@@ -1,30 +1,39 @@
 package bktmkd.android.music;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.ListIterator;
 
 import android.R.integer;
 import android.content.Context;
 import android.provider.Contacts.ContactMethods;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 
 public class MusicBaseAdapter extends BaseAdapter  {
 
 	private LayoutInflater mInflater;
+    private	List<ObjectEntity> data;
 	public  MusicBaseAdapter(Context context)
 	{
 	     super();
+	     data=getData();
 		this.mInflater=LayoutInflater.from(context);
 	}
 	
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return getData().size();
+		return data.size();
 	}
 
 	public Object getItem(int position) {
@@ -39,35 +48,50 @@ public class MusicBaseAdapter extends BaseAdapter  {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
+		ObjectEntity ob=data.get(position);
 		if(convertView==null)
 		{
-
+         
 			convertView=mInflater.inflate(R.layout.item_music, null);
-			holder=new ViewHolder();
+		    holder=new ViewHolder();
 			holder.img=(ImageView)convertView.findViewById(R.id.img);
 			holder.txt=(TextView)convertView.findViewById(R.id.title);
 			convertView.setTag(holder);
+			   Log.d("bktmkd", "aaaaaaaaaaaaaa");
 		}
 		else
 		{
 			holder=(ViewHolder)convertView.getTag();
 		}
-		holder.img.setBackgroundResource(Integer.parseInt(getData().get(position).get("img").toString()));
-		holder.txt.setText(getData().get(position).get("text").toString());
-		return null;
+		holder.img.setBackgroundResource(ob.imgUrl);
+		holder.txt.setText(ob.txt);
+		return convertView;
 	}
-	private ArrayList<HashMap<String,Object>> getData()
+	private List<ObjectEntity> getData()
 	{
-		ArrayList<HashMap<String,Object>> listItem=new ArrayList<HashMap<String,Object>>();
-		/**为动态数组添加数据*/     
-		for(int i=0;i<30;i++)  
-         {  
-             HashMap<String, Object> map = new HashMap<String, Object>();  
-             map.put("img", R.drawable.pause);  
-             map.put("text", "这是第"+i+"行");  
-             listItem.add(map);  
-         } 
-        return listItem;
+		List<ObjectEntity> ListObject=new ArrayList<ObjectEntity>();
+	boolean flag=false;
+		for(int i=0;i<10000;i++)
+		{
+			ObjectEntity ob=new ObjectEntity();
+			if(flag)
+			{
+			ob.imgUrl=R.drawable.pause;
+			}
+			else
+			{
+				ob.imgUrl=R.drawable.play;
+			}
+			flag=!flag;
+			ob.txt=String.valueOf(i);
+			ListObject.add(ob);
+			
+		}
+		return ListObject;
+		
+			
+		
+	
 	}
 	public final class ViewHolder
 	{
@@ -75,7 +99,11 @@ public class MusicBaseAdapter extends BaseAdapter  {
 		public TextView txt;
 		}
 	
+	public class ObjectEntity {
 
+	    public int imgUrl;
+	    public String txt;
+	}
 }
 
 
