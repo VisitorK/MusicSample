@@ -35,14 +35,13 @@ public class DBAdapter extends SQLiteOpenHelper {
 	@Override
 	public void onCreate(SQLiteDatabase db) {
 		this.db = db;
-		System.out.println("Create Database");
 		db.execSQL(CREATE_TBL);
 	}
 
 	//回调函数，当你构造DBHelper的传递的Version与之前的Version调用此函数
 	@Override
 	public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-		System.out.println("update Database");
+	
 
 	}
 	
