@@ -66,6 +66,7 @@ public class MusicBaseAdapter extends BaseAdapter  {
 		}
 		holder.img.setBackgroundResource(R.drawable.pause);
 		holder.txt.setText(this.mycursor.getString(0));
+	
 		return convertView;
 	}
 	
