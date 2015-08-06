@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.View;
@@ -41,5 +42,6 @@ public class MusicListActivity extends Activity {
 			}
 			
 		});
+	
 	}
 }
