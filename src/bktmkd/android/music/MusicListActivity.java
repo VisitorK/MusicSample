@@ -6,7 +6,9 @@ import java.util.List;
 import java.util.Map;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.os.Bundle;
+import android.provider.MediaStore;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 
@@ -21,7 +23,9 @@ public class MusicListActivity extends Activity {
 
 		//SimpleAdapter adapter=new SimpleAdapter(this,getData(), R.layout.item_music,new String[]{"img","title"},new int[]{R.id.img,R.id.title});
        //list.setAdapter(adapter);
-		MusicBaseAdapter adapter=new MusicBaseAdapter(MusicListActivity.this);
+		Cursor c=this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, new String[]{MediaStore.Audio.Media.TITLE,MediaStore.Audio.Media.DURATION,MediaStore.Audio.Media.ARTIST,MediaStore.Audio.Media._ID,MediaStore.Audio.Media.DISPLAY_NAME,MediaStore.Audio.Media.DATA}, null, null, null);
+		
+		MusicBaseAdapter adapter=new MusicBaseAdapter(MusicListActivity.this,c);
 		list.setAdapter(adapter);
 	}
 	private List<Map<String,Object>> getData()

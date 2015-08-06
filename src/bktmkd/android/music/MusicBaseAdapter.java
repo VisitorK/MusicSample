@@ -9,6 +9,7 @@ import java.util.ListIterator;
 
 import android.R.integer;
 import android.content.Context;
+import android.database.Cursor;
 import android.provider.Contacts.ContactMethods;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,17 +24,18 @@ import android.widget.Toast;
 public class MusicBaseAdapter extends BaseAdapter  {
 
 	private LayoutInflater mInflater;
-    private	List<ObjectEntity> data;
-	public  MusicBaseAdapter(Context context)
+    private Cursor mycursor;
+	public  MusicBaseAdapter(Context context,Cursor c)
 	{
 	     super();
-	     data=getData();
+	  //  data=getData();
 		this.mInflater=LayoutInflater.from(context);
+		this.mycursor=c;
 	}
 	
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return data.size();
+		return this.mycursor.getCount();
 	}
 
 	public Object getItem(int position) {
@@ -48,7 +50,7 @@ public class MusicBaseAdapter extends BaseAdapter  {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
-		ObjectEntity ob=data.get(position);
+		this.mycursor.moveToPosition(position);
 		if(convertView==null)
 		{
          
@@ -57,53 +59,26 @@ public class MusicBaseAdapter extends BaseAdapter  {
 			holder.img=(ImageView)convertView.findViewById(R.id.img);
 			holder.txt=(TextView)convertView.findViewById(R.id.title);
 			convertView.setTag(holder);
-			   Log.d("bktmkd", "aaaaaaaaaaaaaa");
 		}
 		else
 		{
 			holder=(ViewHolder)convertView.getTag();
 		}
-		holder.img.setBackgroundResource(ob.imgUrl);
-		holder.txt.setText(ob.txt);
+		holder.img.setBackgroundResource(R.drawable.pause);
+		holder.txt.setText(this.mycursor.getString(0));
 		return convertView;
 	}
-	private List<ObjectEntity> getData()
-	{
-		List<ObjectEntity> ListObject=new ArrayList<ObjectEntity>();
-	boolean flag=false;
-		for(int i=0;i<10000;i++)
-		{
-			ObjectEntity ob=new ObjectEntity();
-			if(flag)
-			{
-			ob.imgUrl=R.drawable.pause;
-			}
-			else
-			{
-				ob.imgUrl=R.drawable.play;
-			}
-			flag=!flag;
-			ob.txt=String.valueOf(i);
-			ListObject.add(ob);
-			
-		}
-		return ListObject;
-		
-			
-		
 	
-	}
 	public final class ViewHolder
 	{
 		public ImageView img;
 		public TextView txt;
 		}
 	
-	public class ObjectEntity {
-
-	    public int imgUrl;
-	    public String txt;
+	
 	}
-}
+	
+
+
 
 
