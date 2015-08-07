@@ -7,6 +7,7 @@ import java.util.Map;
 
 import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -26,13 +27,10 @@ public class MusicListActivity extends Activity {
 	private DBAdapter dbAdapter;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		// TODO Auto-generated method stub
+		
 		setContentView(R.layout.activity_musiclist);
 		super.onCreate(savedInstanceState);
 		ListView list=(ListView)findViewById(R.id.listView1);
-
-		//SimpleAdapter adapter=new SimpleAdapter(this,getData(), R.layout.item_music,new String[]{"img","title"},new int[]{R.id.img,R.id.title});
-       //list.setAdapter(adapter);
 		dbAdapter=new DBAdapter(this);
 		dbAdapter.getReadableDatabase();
 		Cursor musicCursor=null;
@@ -68,14 +66,19 @@ public class MusicListActivity extends Activity {
 		list.setOnItemClickListener(new OnItemClickListener() {
 
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				// TODO Auto-generated method stub
 				
 				TextView tv=(TextView)arg1.findViewById(R.id.title);
 				Cursor cursor=dbAdapter.query(String.valueOf(tv.getText()));
 				if(cursor.moveToFirst())
 				{
 					Toast.makeText(MusicListActivity.this,cursor.getString(6), Toast.LENGTH_LONG).show();
-				}
+					Intent intent=new Intent(MusicListActivity.this,MainActivity.class);
+					intent.putExtra("TITLE", cursor.getString(2));
+					intent.putExtra("DATA", cursor.getString(6));
+					startActivity(intent);
+					finish();
+				
+					}
 				
 			}
 			

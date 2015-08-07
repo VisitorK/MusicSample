@@ -24,6 +24,14 @@ public class MainActivity extends Activity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+       Intent intent=getIntent();
+   
+       if(intent.hasExtra("DATA")&&intent.hasExtra("TITLE"))
+       {
+    	//   String TITLE = intent.getStringExtra("TITLE");   
+    	   String DATA = intent.getStringExtra("DATA");    
+    	   Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
+       }
         btnplay=(ImageButton)findViewById(R.id.btnplay);
         btnplay.setOnClickListener(new OnClickListener() {
        	 Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class); 
@@ -37,15 +45,10 @@ public class MainActivity extends Activity {
 			}
 			else
 			{
-
 				btnplay.setBackgroundResource(R.drawable.pause);
-			 
 			      startService(intentSV);  
-			
 			}
 			PlayFlag=!PlayFlag;
-			
-				
 			}
 		});
         ImageButton btn1=(ImageButton)findViewById(R.id.btnnext);
@@ -53,7 +56,7 @@ public class MainActivity extends Activity {
 			
 			public void onClick(View v) {
 			startActivity(new Intent(MainActivity.this, MusicListActivity.class));
-				
+		
 			}
 		});
      
