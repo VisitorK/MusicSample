@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.ListIterator;
 
 import android.R.integer;
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.Contacts.ContactMethods;
@@ -19,22 +20,23 @@ import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import bktmkd.android.db.DBAdapter;
+import bktmkd.android.model.MusicModel;
 
-
-public class MusicBaseAdapter extends BaseAdapter  {
+public class MusicBaseAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
-    private Cursor mycursor;
-	public  MusicBaseAdapter(Context context,Cursor c)
-	{
-	     super();
-	  //  data=getData();
-		this.mInflater=LayoutInflater.from(context);
-		this.mycursor=c;
+	private Cursor mycursor;
+    private DBAdapter  dbAdapter;
+	public MusicBaseAdapter(Context context,DBAdapter _dbAdapter) {
+		super();
+		this.dbAdapter=_dbAdapter;
+		this.mInflater = LayoutInflater.from(context);
 	}
-	
+
 	public int getCount() {
 		// TODO Auto-generated method stub
+		this.mycursor=dbAdapter.queryALL();
 		return this.mycursor.getCount();
 	}
 
@@ -51,35 +53,25 @@ public class MusicBaseAdapter extends BaseAdapter  {
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
 		this.mycursor.moveToPosition(position);
-		if(convertView==null)
-		{
-         
-			convertView=mInflater.inflate(R.layout.item_music, null);
-		    holder=new ViewHolder();
-			holder.img=(ImageView)convertView.findViewById(R.id.img);
-			holder.txt=(TextView)convertView.findViewById(R.id.title);
+		if (convertView == null) {
+
+			convertView = mInflater.inflate(R.layout.item_music, null);
+			holder = new ViewHolder();
+			holder.img = (ImageView) convertView.findViewById(R.id.img);
+			holder.txt = (TextView) convertView.findViewById(R.id.title);
 			convertView.setTag(holder);
-		}
-		else
-		{
-			holder=(ViewHolder)convertView.getTag();
+		} else {
+			holder = (ViewHolder) convertView.getTag();
 		}
 		holder.img.setBackgroundResource(R.drawable.pause);
-		holder.txt.setText(this.mycursor.getString(0));
-	
+		holder.txt.setText(this.mycursor.getString(1));
+
 		return convertView;
 	}
-	
-	public final class ViewHolder
-	{
+
+	public final class ViewHolder {
 		public ImageView img;
 		public TextView txt;
-		}
-	
-	
 	}
-	
 
-
-
-
+}
