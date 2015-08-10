@@ -20,6 +20,7 @@ public class MusicBroadCastReceive extends BroadcastReceiver {
 			  b.putInt("CURRENTDURATION", inte.getIntExtra("CURRENTDURATION", 0));
 			  message.what=1;
 			  message.setData(b);
+			  
 			  MainActivity.musicHandler.sendMessage(message);
 			
 		}
