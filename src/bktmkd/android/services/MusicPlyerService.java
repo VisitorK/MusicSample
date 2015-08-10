@@ -60,7 +60,8 @@ public class MusicPlyerService extends Service {
 		   mPlayer.start();
 		   mTimer=new Timer(true);
 		   mTimerTask=new MusicTimerTask();
-		   mTimer.schedule(mTimerTask, 100);
+		   mTimer.schedule(mTimerTask,10,500); 
+		  
 		   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
 	}
 
@@ -85,8 +86,10 @@ public class MusicPlyerService extends Service {
 			// TODO Auto-generated method stub
 		//	mPlayer.getDuration();
 			Intent intet=new Intent(BROADCAST_COUNTER_DURATION);
-			intet.putExtra("DURATION",mPlayer.getDuration());
+			intet.putExtra("DURATION",mPlayer.getCurrentPosition());
 			sendBroadcast(intet);
+			Log.d("bktmkd", String.valueOf(mPlayer.getCurrentPosition()));
+			
 		 
 		}
 

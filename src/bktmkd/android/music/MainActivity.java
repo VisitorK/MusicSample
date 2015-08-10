@@ -4,27 +4,42 @@ package bktmkd.android.music;
 import android.app.Activity;
 import android.content.ComponentName;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import bktmkd.android.music.R;
-import bktmkd.android.services.LocalBroadcastManager;
 import bktmkd.android.services.MusicPlyerService;
 
 public class MainActivity extends Activity {
     /** Called when the activity is first created. */
 	private ImageButton btnplay;
 	private boolean PlayFlag=false;
+	public   Handler handler = new Handler(){   
+	        public void handleMessage(Message msg) {  
+	            switch (msg.what) {      
+	            case 1:    
+	            	Bundle b=msg.getData();
+	               Toast.makeText(MainActivity.this, "aaaaaaaaaaa@@@@"+String.valueOf(b.getInt("DURATION")), Toast.LENGTH_SHORT).show();
+	                break;      
+	            }      
+	            super.handleMessage(msg);  
+	        }  
+	          
+	    };  
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-       Intent intent=getIntent();
-   
+        Intent intent=getIntent();
+        
        if(intent.hasExtra("DATA")&&intent.hasExtra("TITLE"))
        {
     	//   String TITLE = intent.getStringExtra("TITLE");   
@@ -33,6 +48,9 @@ public class MainActivity extends Activity {
        }
  
         btnplay=(ImageButton)findViewById(R.id.btnplay);
+        MusicBroadCastReceive bll=new MusicBroadCastReceive();
+        IntentFilter filter=new IntentFilter("bktmkd.android.services.duration");
+        registerReceiver(bll, filter);
         btnplay.setOnClickListener(new OnClickListener() {
        	 Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class); 
 			public void onClick(View v) {
