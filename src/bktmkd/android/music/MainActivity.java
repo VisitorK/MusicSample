@@ -7,12 +7,11 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.IBinder;
-import android.os.Message;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 import bktmkd.android.music.R;
 import bktmkd.android.services.MusicPlyerService;
@@ -21,27 +20,19 @@ public class MainActivity extends Activity {
     /** Called when the activity is first created. */
 	private ImageButton btnplay;
 	private boolean PlayFlag=false;
-	public   Handler handler = new Handler(){   
-	        public void handleMessage(Message msg) {  
-	            switch (msg.what) {      
-	            case 1:    
-	            	Bundle b=msg.getData();
-	               Toast.makeText(MainActivity.this, "aaaaaaaaaaa@@@@"+String.valueOf(b.getInt("DURATION")), Toast.LENGTH_SHORT).show();
-	                break;      
-	            }      
-	            super.handleMessage(msg);  
-	        }  
-	          
-	    };  
+    public static ProgressBar bar;
+ public static   MusicHandler musicHandler;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        bar=(ProgressBar)findViewById(R.id.progressBar1);
+        musicHandler=new MusicHandler();
         Intent intent=getIntent();
-        
        if(intent.hasExtra("DATA")&&intent.hasExtra("TITLE"))
        {
+    	   
     	//   String TITLE = intent.getStringExtra("TITLE");   
     	   String DATA = intent.getStringExtra("DATA");    
     	   Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();

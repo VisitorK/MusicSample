@@ -3,5 +3,7 @@
 
     <string name="hello">Hello World, BktmkdMusicActivity!</string>
     <string name="app_name">BktmkdMusic</string>
-
+    <string name="btnoperateDES">设置按钮</string>
+    <string name="btnsearchDES">搜索按钮</string>
+    
 </resources>

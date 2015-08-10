@@ -12,11 +12,13 @@
         android:orientation="horizontal" >
         <ImageButton
             android:id="@+id/btnoperate"
+            android:contentDescription="@string/btnoperateDES"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:background="@drawable/local_music_control_songs_icon_normal" />
         <ImageButton
             android:id="@+id/btnsearch"
+            android:contentDescription="@string/btnsearchDES"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"

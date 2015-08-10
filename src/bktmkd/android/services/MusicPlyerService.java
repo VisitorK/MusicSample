@@ -2,12 +2,9 @@ package bktmkd.android.services;
 
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.app.LoaderManager.LoaderCallbacks;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
@@ -61,7 +58,6 @@ public class MusicPlyerService extends Service {
 		   mTimer=new Timer(true);
 		   mTimerTask=new MusicTimerTask();
 		   mTimer.schedule(mTimerTask,10,500); 
-		  
 		   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
 	}
 
@@ -86,7 +82,8 @@ public class MusicPlyerService extends Service {
 			// TODO Auto-generated method stub
 		//	mPlayer.getDuration();
 			Intent intet=new Intent(BROADCAST_COUNTER_DURATION);
-			intet.putExtra("DURATION",mPlayer.getCurrentPosition());
+			intet.putExtra("DURATION",mPlayer.getDuration());
+			intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
 			sendBroadcast(intet);
 			Log.d("bktmkd", String.valueOf(mPlayer.getCurrentPosition()));
 			

@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Message;
 
 public class MusicBroadCastReceive extends BroadcastReceiver {
-
 	@Override
 	public void onReceive(Context context, Intent intent) {
 		// TODO Auto-generated method stub
@@ -18,12 +17,11 @@ public class MusicBroadCastReceive extends BroadcastReceiver {
 			  Message message = new Message(); 	
 			  Bundle b=new Bundle();
 			  b.putInt("DURATION", inte.getIntExtra("DURATION", 0));
+			  b.putInt("CURRENTDURATION", inte.getIntExtra("CURRENTDURATION", 0));
 			  message.what=1;
 			  message.setData(b);
-			  MainActivity ac=new MainActivity();
-			  ac.handler.sendMessage(message);
+			  MainActivity.musicHandler.sendMessage(message);
+			
 		}
 	}
-	
-
 }
