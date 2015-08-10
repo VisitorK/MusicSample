@@ -39,6 +39,11 @@ public class MusicHandler extends Handler {
 		{
 		MainActivity.endTime.setText(formatTime(b.getInt("DURATION")));
 		}
+		String title=b.getString("TITLE").length()>15?b.getString("TITLE").substring(0, 15)+"...":b.getString("TITLE");
+		if(MainActivity.musicTitle.getText()!=title)
+		{
+			MainActivity.musicTitle.setText(title);
+		}
 		
 	}
 

@@ -18,6 +18,7 @@ public class MusicBroadCastReceive extends BroadcastReceiver {
 			  Bundle b=new Bundle();
 			  b.putInt("DURATION", inte.getIntExtra("DURATION", 0));
 			  b.putInt("CURRENTDURATION", inte.getIntExtra("CURRENTDURATION", 0));
+			  b.putString("TITLE", inte.getStringExtra("TITLE"));
 			  message.what=1;
 			  message.setData(b);
 			  

@@ -13,6 +13,7 @@ import android.widget.Toast;
 
 public class MusicPlyerService extends Service {
 	private static String TAG = "MusicService";
+	public  String title="";
 	private MediaPlayer mPlayer;
 	private Timer mTimer;
 	 private MusicTimerTask mTimerTask;
@@ -49,9 +50,8 @@ public class MusicPlyerService extends Service {
 		Intent musicIntent=intent;
 		   if(musicIntent.hasExtra("DATA")&&musicIntent.hasExtra("TITLE"))
 	       {
-	    	//   String TITLE = intent.getStringExtra("TITLE");   
-	    	   String DATA = musicIntent.getStringExtra("DATA");    
-	    	   Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
+			   title = intent.getStringExtra("TITLE");   
+	    	   String DATA = musicIntent.getStringExtra("DATA");   
 	    	   mPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
 	       }
 		   mPlayer.start();
@@ -84,6 +84,7 @@ public class MusicPlyerService extends Service {
 			Intent intet=new Intent(BROADCAST_COUNTER_DURATION);
 			intet.putExtra("DURATION",mPlayer.getDuration());
 			intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
+			intet.putExtra("TITLE", title);
 			sendBroadcast(intet);
 			Log.d("bktmkd", String.valueOf(mPlayer.getCurrentPosition()));
 			

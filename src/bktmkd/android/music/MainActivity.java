@@ -23,6 +23,7 @@ public class MainActivity extends Activity {
 	public static ProgressBar bar;
 	public static TextView startTime;
 	public static TextView endTime;
+	public static TextView musicTitle;
 	public static MusicHandler musicHandler;
 
 	@Override
@@ -32,6 +33,7 @@ public class MainActivity extends Activity {
 		bar = (ProgressBar) findViewById(R.id.progressBar1);
 		startTime=(TextView)findViewById(R.id.textView1);
 		endTime=(TextView)findViewById(R.id.textView2);
+		musicTitle=(TextView)findViewById(R.id.textViewtitle);
 		musicHandler = new MusicHandler();
 		Intent intent = getIntent();
 		if (intent.hasExtra("DATA") && intent.hasExtra("TITLE")) {

@@ -58,7 +58,6 @@ public class MusicListActivity extends Activity {
 				Cursor cursor=dbAdapter.query(String.valueOf(tv.getText()));
 				if(cursor.moveToFirst())
 				{
-					Toast.makeText(MusicListActivity.this,cursor.getString(6), Toast.LENGTH_LONG).show();
 					Intent intent=new Intent(MusicListActivity.this,MusicPlyerService.class);
 					intent.putExtra("TITLE", cursor.getString(1));
 					intent.putExtra("DATA", cursor.getString(6));
