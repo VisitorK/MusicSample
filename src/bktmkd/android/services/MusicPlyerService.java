@@ -8,7 +8,6 @@ import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 
 public class MusicPlyerService extends Service {
@@ -29,8 +28,6 @@ public class MusicPlyerService extends Service {
 	public void onCreate() {
 		// TODO Auto-generated method stub
 		Log.d(TAG, "CreateService");
-		mPlayer=MediaPlayer.create(getApplicationContext(), bktmkd.android.music.R.raw.aaa);
-	   mPlayer.setLooping(true);
 		super.onCreate();
 	}
 
@@ -53,12 +50,13 @@ public class MusicPlyerService extends Service {
 			   title = intent.getStringExtra("TITLE");   
 	    	   String DATA = musicIntent.getStringExtra("DATA");   
 	    	   mPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
+	    	   mPlayer.start();
+			   mTimer=new Timer(true);
+			   mTimerTask=new MusicTimerTask();
+			   mTimer.schedule(mTimerTask,10,500); 
+			   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
 	       }
-		   mPlayer.start();
-		   mTimer=new Timer(true);
-		   mTimerTask=new MusicTimerTask();
-		   mTimer.schedule(mTimerTask,10,500); 
-		   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
+		 
 	}
 
 	@Override
@@ -86,9 +84,6 @@ public class MusicPlyerService extends Service {
 			intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
 			intet.putExtra("TITLE", title);
 			sendBroadcast(intet);
-			Log.d("bktmkd", String.valueOf(mPlayer.getCurrentPosition()));
-			
-		 
 		}
 
 		@Override
