@@ -1,13 +1,10 @@
 package bktmkd.android.services;
 
-import android.R;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
-import android.widget.Toast;
 
 public class MusicPlyerService extends Service {
 	private static String TAG = "MusicService";
@@ -27,8 +24,6 @@ public class MusicPlyerService extends Service {
 		mPlayer=MediaPlayer.create(getApplicationContext(), bktmkd.android.music.R.raw.aaa);
 	   mPlayer.setLooping(true);
 		super.onCreate();
-		
-	
 	}
 
 	@Override
@@ -37,12 +32,15 @@ public class MusicPlyerService extends Service {
 		mPlayer.stop();
 		super.onDestroy();
 	}
+	
+	@SuppressWarnings("deprecation")
 	@Override
 	public void onStart(Intent intent, int startId) {
 		// TODO Auto-generated method stub
+		super.onStart(intent, startId);
 		mPlayer.start();
 	
-		super.onStart(intent, startId);
+	
 	}
 
 	@Override
