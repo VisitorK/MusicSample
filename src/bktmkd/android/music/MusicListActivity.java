@@ -13,6 +13,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 import bktmkd.android.db.DBAdapter;
+import bktmkd.android.services.MusicPlyerService;
 
 public class MusicListActivity extends Activity {
 	private DBAdapter dbAdapter;
@@ -58,10 +59,10 @@ public class MusicListActivity extends Activity {
 				if(cursor.moveToFirst())
 				{
 					Toast.makeText(MusicListActivity.this,cursor.getString(6), Toast.LENGTH_LONG).show();
-					Intent intent=new Intent(MusicListActivity.this,MainActivity.class);
+					Intent intent=new Intent(MusicListActivity.this,MusicPlyerService.class);
 					intent.putExtra("TITLE", cursor.getString(2));
 					intent.putExtra("DATA", cursor.getString(6));
-					startActivity(intent);
+					startService(intent);
 					finish();
 					}
 			}

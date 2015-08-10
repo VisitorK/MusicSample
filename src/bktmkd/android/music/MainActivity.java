@@ -34,7 +34,6 @@ public class MainActivity extends Activity {
         btnplay.setOnClickListener(new OnClickListener() {
        	 Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class); 
 			public void onClick(View v) {
-			
 			if(PlayFlag)
 			{
 				btnplay.setBackgroundResource(R.drawable.play);
@@ -42,7 +41,7 @@ public class MainActivity extends Activity {
 			}
 			else
 			{
-				btnplay.setBackgroundResource(R.drawable.pause);
+				  btnplay.setBackgroundResource(R.drawable.pause);
 			      startService(intentSV);  
 			}
 			PlayFlag=!PlayFlag;
@@ -52,10 +51,8 @@ public class MainActivity extends Activity {
         btn1.setOnClickListener(new OnClickListener() {	
 			public void onClick(View v) {
 			startActivity(new Intent(MainActivity.this, MusicListActivity.class));
-		
 			}
 		});
-     
     }
     final ServiceConnection con=new ServiceConnection() {
 		
