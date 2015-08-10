@@ -12,6 +12,7 @@ import android.view.View.OnClickListener;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import bktmkd.android.music.R;
+import bktmkd.android.services.LocalBroadcastManager;
 import bktmkd.android.services.MusicPlyerService;
 
 public class MainActivity extends Activity {
@@ -30,6 +31,7 @@ public class MainActivity extends Activity {
     	   String DATA = intent.getStringExtra("DATA");    
     	   Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
        }
+ 
         btnplay=(ImageButton)findViewById(R.id.btnplay);
         btnplay.setOnClickListener(new OnClickListener() {
        	 Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class); 

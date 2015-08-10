@@ -1,17 +1,25 @@
 package bktmkd.android.services;
 
+import java.util.Timer;
+import java.util.TimerTask;
+
+import android.app.LoaderManager.LoaderCallbacks;
 import android.app.Service;
 import android.content.Intent;
 import android.media.MediaPlayer;
+import android.media.MediaPlayer.OnBufferingUpdateListener;
 import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 import android.widget.Toast;
 
+
 public class MusicPlyerService extends Service {
 	private static String TAG = "MusicService";
 	private MediaPlayer mPlayer;
-
+	private Timer mTimer;
+	 private MusicTimerTask mTimerTask;
+	  public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration"; 
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
@@ -32,6 +40,7 @@ public class MusicPlyerService extends Service {
 	public void onDestroy() {
 		// TODO Auto-generated method stub
 		mPlayer.stop();
+		mTimerTask.cancel();
 		super.onDestroy();
 	}
 	
@@ -47,13 +56,12 @@ public class MusicPlyerService extends Service {
 	    	   String DATA = musicIntent.getStringExtra("DATA");    
 	    	   Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
 	    	   mPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
-	   		
 	       }
 		   mPlayer.start();
-		   Toast.makeText(getApplicationContext(),  musicIntent.getStringExtra("DATA"), Toast.LENGTH_LONG).show();
+		   mTimer=new Timer(true);
+		   mTimerTask=new MusicTimerTask();
+		   mTimer.schedule(mTimerTask, 100);
 		   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
-		
-
 	}
 
 	@Override
@@ -61,6 +69,33 @@ public class MusicPlyerService extends Service {
 		// TODO Auto-generated method stub
 		mPlayer.stop();
 		return super.onUnbind(intent);
+	}
+	public class MusicTimerTask extends TimerTask
+	
+	{
+
+		@Override
+		public boolean cancel() {
+			// TODO Auto-generated method stub
+			return super.cancel();
+		}
+
+		@Override
+		public void run() {
+			// TODO Auto-generated method stub
+		//	mPlayer.getDuration();
+			Intent intet=new Intent(BROADCAST_COUNTER_DURATION);
+			intet.putExtra("DURATION",mPlayer.getDuration());
+			sendBroadcast(intet);
+		 
+		}
+
+		@Override
+		public long scheduledExecutionTime() {
+			// TODO Auto-generated method stub
+			return super.scheduledExecutionTime();
+		}
+		
 	}
 
 }
