@@ -33,6 +33,13 @@ public class MusicHandler extends Handler {
 		Bundle b=msg.getData();
 		int currentProgress=(int)(((double)(b.getInt("CURRENTDURATION")))/((double)(b.getInt("DURATION")))*100);
 		MainActivity.bar.setSecondaryProgress(currentProgress);
+		MainActivity.startTime.setText(formatTime(b.getInt("CURRENTDURATION")));
+	    //最终时间不相同则更新
+		if(MainActivity.endTime.getText()!=formatTime(b.getInt("DURATION")))
+		{
+		MainActivity.endTime.setText(formatTime(b.getInt("DURATION")));
+		}
+		
 	}
 
 	@Override
@@ -46,6 +53,28 @@ public class MusicHandler extends Handler {
 		// TODO Auto-generated method stub
 		return super.toString();
 	}
+	
+	  public String formatTime(int time)
+	    {
+		  int s = time / 1000;// 秒
+	        int m = s / 60;// 分
+	        int add = s % 60;// 秒    
+	        String con = "";
+	        if (add > 10 && m > 10)
+	            con = m + ":" + add;
+	        else if (add < 10 && m > 10)
+	            con = m + ":0" + add;
+	        else if (m < 10&& add < 10)
+	            con = "0" + m + ":0" + add;
+	        else if (m > 10 && add < 10)
+	            con = "" + m + ":0" + add;    
+	        else if (m < 10 &&  add > 10)
+	            con = "0" + m + ":" + add ;    
+	        return con;
+	    }
+	 
+	
+	 
 	
 
 }

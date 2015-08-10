@@ -2,80 +2,109 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:orientation="vertical"
-    android:background="@drawable/bg" >
+    android:background="@drawable/bg"
+    android:orientation="vertical" >
+
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/maintop"
         android:orientation="horizontal" >
+
         <ImageButton
             android:id="@+id/btnoperate"
-            android:contentDescription="@string/btnoperateDES"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/local_music_control_songs_icon_normal" />
+            android:background="@drawable/local_music_control_songs_icon_normal"
+            android:contentDescription="@string/btnoperateDES" />
+
         <ImageButton
             android:id="@+id/btnsearch"
-            android:contentDescription="@string/btnsearchDES"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentRight="true"
-            android:background="@drawable/local_music_scan_icon_normal" />
+            android:background="@drawable/local_music_scan_icon_normal"
+            android:contentDescription="@string/btnsearchDES" />
     </RelativeLayout>
+
     <RelativeLayout
+        android:id="@+id/relativeLayout2"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"  
-     >
-        <LinearLayout 
-            android:orientation="vertical"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content">
-         <LinearLayout
-             android:layout_width="fill_parent"
-             android:layout_height="wrap_content"
-             android:orientation="horizontal" >
-             <ProgressBar
-                 android:id="@+id/progressBar1"
-                 style="?android:attr/progressBarStyleHorizontal"
-                 android:layout_width="wrap_content"
-                 android:layout_height="5dp"
-                 android:layout_weight="0.61" />
-
-         </LinearLayout>
+        android:layout_alignParentBottom="true" >
 
         <LinearLayout
-             android:orientation="horizontal"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:paddingTop="10dp">
+            android:orientation="vertical" >
+
+            <RelativeLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal" >
 
-            <ImageButton
-                android:id="@+id/btnpre"
-                android:layout_width="wrap_content"
+  
+
+    <TextView
+        android:id="@+id/textView1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:text="正在播放时间" />
+      <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentTop="true"
+        android:text="总时间" />
+
+            </RelativeLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/pre"
-                android:layout_marginLeft="60dp"
-                 />
-              <ImageButton
-                android:id="@+id/btnplay"
-                android:layout_width="wrap_content"
+                android:orientation="horizontal" >
+
+                <ProgressBar
+                    android:id="@+id/progressBar1"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="5dp"
+                    android:layout_weight="0.61" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="fill_parent"
                 android:layout_height="wrap_content"
-                android:background="@drawable/play"
-                android:layout_marginLeft="15dp"
-                 />
+                android:orientation="horizontal"
+                android:paddingTop="10dp" >
+
                 <ImageButton
-                android:id="@+id/btnnext"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:background="@drawable/next"
-                android:layout_marginLeft="15dp"
-                 />
-            
-        </LinearLayout>
+                    android:id="@+id/btnpre"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="60dp"
+                    android:background="@drawable/pre" />
+
+                <ImageButton
+                    android:id="@+id/btnplay"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:background="@drawable/play" />
+
+                <ImageButton
+                    android:id="@+id/btnnext"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginLeft="15dp"
+                    android:background="@drawable/next" />
+            </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
+
 
 </RelativeLayout>
