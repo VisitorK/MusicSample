@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
@@ -23,11 +22,9 @@ import android.widget.Toast;
 import bktmkd.android.db.DBAdapter;
 
 public class MusicListActivity extends Activity {
-
 	private DBAdapter dbAdapter;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
-		
 		setContentView(R.layout.activity_musiclist);
 		super.onCreate(savedInstanceState);
 		ListView list=(ListView)findViewById(R.id.listView1);
@@ -44,7 +41,6 @@ public class MusicListActivity extends Activity {
 						MediaStore.Audio.Media.DISPLAY_NAME,
 						MediaStore.Audio.Media.DATA}, 
 				null, null, null);
-		
 		if(musicCursor.moveToFirst())
 		{
 		for (int i = 0; i < musicCursor.getCount(); i++) {
@@ -57,16 +53,13 @@ public class MusicListActivity extends Activity {
 			values.put("DISPLAY_NAME", musicCursor.getString(4));
 			values.put("DATA", musicCursor.getString(5));
 			dbAdapter.insert(values);
-		
 		}
 		}
 		}
 		MusicBaseAdapter adapter=new MusicBaseAdapter(MusicListActivity.this,dbAdapter);
 		list.setAdapter(adapter);
 		list.setOnItemClickListener(new OnItemClickListener() {
-
 			public void onItemClick(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-				
 				TextView tv=(TextView)arg1.findViewById(R.id.title);
 				Cursor cursor=dbAdapter.query(String.valueOf(tv.getText()));
 				if(cursor.moveToFirst())
@@ -77,12 +70,8 @@ public class MusicListActivity extends Activity {
 					intent.putExtra("DATA", cursor.getString(6));
 					startActivity(intent);
 					finish();
-				
 					}
-				
 			}
-			
 		});
-	
 	}
 }
