@@ -39,8 +39,7 @@ public class MusicPlyerService extends Service {
 		// TODO Auto-generated method stub
 		super.onStart(intent, startId);
 		mPlayer.start();
-	
-	
+
 	}
 
 	@Override

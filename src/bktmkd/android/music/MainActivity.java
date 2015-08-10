@@ -39,7 +39,6 @@ public class MainActivity extends Activity {
 			{
 				btnplay.setBackgroundResource(R.drawable.play);
 				stopService(intentSV);
-				
 			}
 			else
 			{
@@ -49,9 +48,8 @@ public class MainActivity extends Activity {
 			PlayFlag=!PlayFlag;
 			}
 		});
-        ImageButton btn1=(ImageButton)findViewById(R.id.btnnext);
-        btn1.setOnClickListener(new OnClickListener() {
-			
+        ImageButton btn1=(ImageButton)findViewById(R.id.btnoperate);
+        btn1.setOnClickListener(new OnClickListener() {	
 			public void onClick(View v) {
 			startActivity(new Intent(MainActivity.this, MusicListActivity.class));
 		
