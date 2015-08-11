@@ -15,7 +15,7 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.animation.AnimationUtils;
+
 import bktmkd.android.db.DBAdapter;
 import bktmkd.android.music.MainActivity;
 import bktmkd.android.musiclrc.MusicLrcContent;
@@ -32,6 +32,7 @@ public class MusicPlyerService extends Service {
 	private MusicLrcProcess mLrcProcess; // 歌词处理
 	private List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); // 存放歌词列表对象
 	private int index = 0;
+	
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -46,6 +47,27 @@ public class MusicPlyerService extends Service {
 		Log.d(TAG, "CreateService");
 		super.onCreate();
 		mPlayer = new MediaPlayer();
+		mPlayer.setOnCompletionListener(new OnCompletionListener() {
+
+			public void onCompletion(MediaPlayer mp) {
+				// TODO Auto-generated method stub
+				DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
+				dbAdapter.getReadableDatabase();
+				int count = dbAdapter.GetCount();
+				// 如果播放的不是最后一首歌曲
+				if (count > ID) {
+					ID = ID + 1;
+				} else {
+					ID = 1;
+				}
+				Cursor c = dbAdapter.querybyID(ID);
+				if (c.moveToFirst()) {
+					title = c.getString(1);
+					mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
+					mPlayer.start();
+				}
+			}
+		});
 		mTimer = new Timer(true);
 		mTimerTask = new MusicTimerTask();
 		mTimer.schedule(mTimerTask, 10, 500);
@@ -72,27 +94,6 @@ public class MusicPlyerService extends Service {
 			ID = Integer.parseInt(intent.getStringExtra("ID"));
 			String DATA = musicIntent.getStringExtra("DATA");
 			mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
-			mPlayer.setOnCompletionListener(new OnCompletionListener() {
-
-				public void onCompletion(MediaPlayer mp) {
-					// TODO Auto-generated method stub
-					DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
-					dbAdapter.getReadableDatabase();
-					int count = dbAdapter.GetCount();
-					// 如果播放的不是最后一首歌曲
-					if (count > ID) {
-						ID = ID + 1;
-					} else {
-						ID = 1;
-					}
-					Cursor c = dbAdapter.querybyID(ID);
-					if (c.moveToFirst()) {
-						title = c.getString(1);
-						mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
-						mPlayer.start();
-					}
-				}
-			});
 			mPlayer.start();
 
 		}
@@ -155,6 +156,8 @@ public class MusicPlyerService extends Service {
 			Cursor c = dbAdapter.querybyID(ID);
 			if (c.moveToFirst()) {
 				title = c.getString(1);
+				mPlayer.reset();
+				initLrc(c.getString(6));
 				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 				mPlayer.start();
 			}
@@ -183,6 +186,8 @@ public class MusicPlyerService extends Service {
 			Cursor c = dbAdapter.querybyID(ID);
 			if (c.moveToFirst()) {
 				title = c.getString(1);
+				mPlayer.reset();
+				initLrc(c.getString(6));
 				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 				mPlayer.start();
 			}
@@ -200,7 +205,8 @@ public class MusicPlyerService extends Service {
 	public void initLrc(String path) {
 		mLrcProcess = new MusicLrcProcess();
 		// 读取歌词文件
-		mLrcProcess.readLRC(path);
+	mLrcProcess.readLRC(path);
+	
 		// 传回处理后的歌词文件
 		lrcList = mLrcProcess.getLrcList();
 	
@@ -208,7 +214,7 @@ public class MusicPlyerService extends Service {
 	
 		// 切换带动画显示歌词
 	//	MainActivity.lrcView.setAnimation(AnimationUtils.loadAnimation(MusicPlyerService.this, android.R.anim.anticipate_interpolator));
-		Log.d("bktmkd1111", "4243234");
+	
 		handler.post(mRunnable);
 	}
 
@@ -217,6 +223,7 @@ public class MusicPlyerService extends Service {
 	Runnable mRunnable = new Runnable() {
 
 		public void run() {
+		
 			MainActivity.lrcView.setIndex(lrcIndex());
 			MainActivity.lrcView.invalidate();
 			handler.postDelayed(mRunnable, 100);
