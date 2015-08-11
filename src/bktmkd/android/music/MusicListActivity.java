@@ -58,8 +58,10 @@ public class MusicListActivity extends Activity {
 				if(cursor.moveToFirst())
 				{
 					Intent intent=new Intent(MusicListActivity.this,MusicPlyerService.class);
+					intent.putExtra("ID", cursor.getString(0));
 					intent.putExtra("TITLE", cursor.getString(1));
 					intent.putExtra("DATA", cursor.getString(6));
+					
 					startService(intent);
 					finish();
 					}
