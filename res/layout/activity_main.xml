@@ -36,7 +36,6 @@
             android:background="@drawable/local_music_scan_icon_normal"
             android:contentDescription="@string/btnsearchDES" />
     </RelativeLayout>
-
     <RelativeLayout
         android:id="@+id/relativeLayout2"
         android:layout_width="fill_parent"
@@ -116,5 +115,20 @@
             </LinearLayout>
         </LinearLayout>
     </RelativeLayout>
+
+    <RelativeLayout
+        android:id="@+id/relativeLayoutlrc"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/relativeLayout2"
+        android:layout_alignParentLeft="true" >
+    </RelativeLayout>
+
+    <bktmkd.android.musiclrc.MusicLrcView
+        android:id="@+id/lrcShowView"
+        android:layout_width="match_parent"
+        android:layout_height="400dip"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/relativeLayout1" />
 
 </RelativeLayout>

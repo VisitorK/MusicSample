@@ -52,11 +52,9 @@ public class DBAdapter extends SQLiteOpenHelper {
 		//获取SQLiteDatabase实例
 		SQLiteDatabase db = getWritableDatabase();
 		//插入数据库中
-		Log.d("bktmkd", "插入数据");
 		db.insert(TABLE_NAME, null, values);
 		db.close();
 	}
-	
 	//查询方法
 	public Cursor queryALL(){
 		SQLiteDatabase db = getReadableDatabase();
@@ -72,6 +70,23 @@ public class DBAdapter extends SQLiteOpenHelper {
 		//获取Cursor
 		Cursor c = db.query(TABLE_NAME, null, "TITLE=?", new String[]{musicTITLE}, null, null, null, null);
 		return c;	
+	}
+	//返回有多少行数据
+	public int GetCount()
+	{
+		SQLiteDatabase db = getReadableDatabase();
+		//获取Cursor
+		Cursor c = db.query(TABLE_NAME, null, null, null, null, null, null, null);
+		return c.getCount();
+	}
+	//根据ID返回数据
+	public Cursor querybyID(int _id)
+	{
+
+		SQLiteDatabase db = getReadableDatabase();
+	    return	db.rawQuery("select * from music where _id="+_id, null);
+	//	Cursor c = db.query(TABLE_NAME, null, "_id="+_id, null, null, null, null, null);
+	//	return c;	
 	}
 	
 	//根据唯一标识_id  来删除数据

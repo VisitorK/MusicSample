@@ -9,6 +9,8 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
@@ -17,6 +19,7 @@ import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import bktmkd.android.music.R;
+import bktmkd.android.musiclrc.MusicLrcView;
 import bktmkd.android.services.MusicPlyerService;
 
 public class MainActivity extends Activity {
@@ -28,6 +31,7 @@ public class MainActivity extends Activity {
 	public static TextView endTime;
 	public static TextView musicTitle;
 	public static MusicHandler musicHandler;
+	public static  MusicLrcView lrcView;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -37,6 +41,11 @@ public class MainActivity extends Activity {
 		startTime=(TextView)findViewById(R.id.textView1);
 		endTime=(TextView)findViewById(R.id.textView2);
 		musicTitle=(TextView)findViewById(R.id.textViewtitle);
+		lrcView=(MusicLrcView)findViewById(R.id.lrcShowView);
+		   Animation mAnimationRight = AnimationUtils.loadAnimation(
+				   MainActivity.this, android.R.anim.slide_in_left);
+		   lrcView.setAnimation(mAnimationRight);
+     
 		musicHandler = new MusicHandler();
 		Intent intent = getIntent();
 		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
@@ -77,14 +86,18 @@ public class MainActivity extends Activity {
 		IntentFilter filter = new IntentFilter("bktmkd.android.services.duration");
 		registerReceiver(bll, filter);
 		btnplay.setOnClickListener(new OnClickListener() {
-			Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
+		
 
 			public void onClick(View v) {
 				if (PlayFlag) {
 					btnplay.setBackgroundResource(R.drawable.play);
+					Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
+					intentSV.putExtra("STOP", "STOP");
 					stopService(intentSV);
 				} else {
 					btnplay.setBackgroundResource(R.drawable.pause);
+					Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
+					intentSV.putExtra("START", "START");
 					startService(intentSV);
 				}
 				PlayFlag = !PlayFlag;
@@ -94,6 +107,27 @@ public class MainActivity extends Activity {
 		btn1.setOnClickListener(new OnClickListener() {
 			public void onClick(View v) {
 				startActivity(new Intent(MainActivity.this, MusicListActivity.class));
+			}
+		});
+		//上一曲
+		findViewById(R.id.btnpre).setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
+				intentSV.putExtra("PRE", "PRE");
+				startService(intentSV);
+				
+			}
+		});
+		//下一曲
+		findViewById(R.id.btnnext).setOnClickListener(new OnClickListener() {
+			
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
+				intentSV.putExtra("NEXT", "NEXT");
+				startService(intentSV);
 			}
 		});
 	}
