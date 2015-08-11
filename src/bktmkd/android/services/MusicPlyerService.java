@@ -9,18 +9,18 @@ import android.net.Uri;
 import android.os.IBinder;
 import android.util.Log;
 
-
 public class MusicPlyerService extends Service {
 	private static String TAG = "MusicService";
-	public  String title="";
+	public String title = "";
 	private MediaPlayer mPlayer;
 	private Timer mTimer;
-	 private MusicTimerTask mTimerTask;
-	  public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration"; 
+	private MusicTimerTask mTimerTask;
+	public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration";
+
 	@Override
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
-		 mPlayer.start();
+		mPlayer.start();
 		return null;
 	}
 
@@ -38,25 +38,29 @@ public class MusicPlyerService extends Service {
 		mTimerTask.cancel();
 		super.onDestroy();
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onStart(Intent intent, int startId) {
 		// TODO Auto-generated method stub
 		super.onStart(intent, startId);
-		Intent musicIntent=intent;
-		   if(musicIntent.hasExtra("DATA")&&musicIntent.hasExtra("TITLE"))
-	       {
-			   title = intent.getStringExtra("TITLE");   
-	    	   String DATA = musicIntent.getStringExtra("DATA");   
-	    	   mPlayer=MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
-	    	   mPlayer.start();
-			   mTimer=new Timer(true);
-			   mTimerTask=new MusicTimerTask();
-			   mTimer.schedule(mTimerTask,10,500); 
-			   Log.d("bktmkd",  musicIntent.getStringExtra("TITLE"));
-	       }
-		 
+		Intent musicIntent = intent;
+		if (musicIntent.hasExtra("DATA") && musicIntent.hasExtra("TITLE")) {
+			title = intent.getStringExtra("TITLE");
+			String DATA = musicIntent.getStringExtra("DATA");
+			mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
+			mPlayer.start();
+			mTimer = new Timer(true);
+			mTimerTask = new MusicTimerTask();
+			mTimer.schedule(mTimerTask, 10, 500);
+			Log.d("MusicService", musicIntent.getStringExtra("TITLE"));
+		}
+		if (!title.equals("") && musicIntent.hasExtra("PROGRESS")) {
+			int progress = (int) (((double) (mPlayer.getDuration())) * (double) (musicIntent.getIntExtra("PROGRESS", 0))
+					/ (double) 100);
+			mPlayer.seekTo(progress);
+		}
+
 	}
 
 	@Override
@@ -65,9 +69,8 @@ public class MusicPlyerService extends Service {
 		mPlayer.stop();
 		return super.onUnbind(intent);
 	}
-	public class MusicTimerTask extends TimerTask
-	
-	{
+
+	public class MusicTimerTask extends TimerTask {
 
 		@Override
 		public boolean cancel() {
@@ -78,9 +81,8 @@ public class MusicPlyerService extends Service {
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-		//	mPlayer.getDuration();
-			Intent intet=new Intent(BROADCAST_COUNTER_DURATION);
-			intet.putExtra("DURATION",mPlayer.getDuration());
+			Intent intet = new Intent(BROADCAST_COUNTER_DURATION);
+			intet.putExtra("DURATION", mPlayer.getDuration());
 			intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
 			intet.putExtra("TITLE", title);
 			sendBroadcast(intet);
@@ -91,7 +93,7 @@ public class MusicPlyerService extends Service {
 			// TODO Auto-generated method stub
 			return super.scheduledExecutionTime();
 		}
-		
+
 	}
 
 }

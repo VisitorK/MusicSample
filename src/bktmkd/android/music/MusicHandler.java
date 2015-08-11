@@ -4,6 +4,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.widget.ProgressBar;
 
 public class MusicHandler extends Handler {
 
@@ -32,7 +33,7 @@ public class MusicHandler extends Handler {
 		super.handleMessage(msg);
 		Bundle b=msg.getData();
 		int currentProgress=(int)(((double)(b.getInt("CURRENTDURATION")))/((double)(b.getInt("DURATION")))*100);
-		MainActivity.bar.setSecondaryProgress(currentProgress);
+		MainActivity.bar.setProgress(currentProgress);
 		MainActivity.startTime.setText(formatTime(b.getInt("CURRENTDURATION")));
 	    //最终时间不相同则更新
 		if(MainActivity.endTime.getText()!=formatTime(b.getInt("DURATION")))
@@ -44,6 +45,12 @@ public class MusicHandler extends Handler {
 		{
 			MainActivity.musicTitle.setText(title);
 		}
+		if(!MainActivity.PlayFlag)
+		{
+			MainActivity.btnplay.setBackgroundResource(R.drawable.pause);
+			MainActivity.PlayFlag=true;
+		}
+	
 		
 	}
 
@@ -58,7 +65,7 @@ public class MusicHandler extends Handler {
 		// TODO Auto-generated method stub
 		return super.toString();
 	}
-	
+	//毫秒转化成时间
 	  public String formatTime(int time)
 	    {
 		  int s = time / 1000;// 秒
@@ -77,9 +84,4 @@ public class MusicHandler extends Handler {
 	            con = "0" + m + ":" + add ;    
 	        return con;
 	    }
-	 
-	
-	 
-	
-
 }

@@ -75,12 +75,16 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal" >
 
-                <ProgressBar
-                    android:id="@+id/progressBar1"
-                    style="?android:attr/progressBarStyleHorizontal"
-                    android:layout_width="wrap_content"
-                    android:layout_height="5dp"
-                    android:layout_weight="0.61" />
+                <SeekBar
+                    android:id="@+id/progressbar1"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_gravity="center"
+                    android:paddingLeft="1dp"
+                    android:paddingRight="1dp"
+                    android:progressDrawable="@drawable/seekbar"
+                    android:thumb="@drawable/detail_icon_schedule_ball" />
             </LinearLayout>
 
             <LinearLayout

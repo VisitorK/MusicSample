@@ -9,8 +9,11 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
+import android.widget.SeekBar;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
 import bktmkd.android.music.R;
@@ -18,9 +21,9 @@ import bktmkd.android.services.MusicPlyerService;
 
 public class MainActivity extends Activity {
 	/** Called when the activity is first created. */
-	private ImageButton btnplay;
-	private boolean PlayFlag = false;
-	public static ProgressBar bar;
+	public static ImageButton btnplay;
+	public static boolean PlayFlag = false;
+	public static SeekBar bar;
 	public static TextView startTime;
 	public static TextView endTime;
 	public static TextView musicTitle;
@@ -30,19 +33,45 @@ public class MainActivity extends Activity {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		bar = (ProgressBar) findViewById(R.id.progressBar1);
+		bar = (SeekBar) findViewById(R.id.progressbar1);
 		startTime=(TextView)findViewById(R.id.textView1);
 		endTime=(TextView)findViewById(R.id.textView2);
 		musicTitle=(TextView)findViewById(R.id.textViewtitle);
 		musicHandler = new MusicHandler();
 		Intent intent = getIntent();
+		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
+			
+			boolean flag=false;
+			public void onStopTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				flag=false;
+			}
+			
+			public void onStartTrackingTouch(SeekBar seekBar) {
+				// TODO Auto-generated method stub
+				flag=true;
+			}
+			
+			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+				// TODO Auto-generated method stub
+				if(flag=true)
+				{
+					Intent intent=new Intent(MainActivity.this, MusicPlyerService.class);
+					intent.putExtra("PROGRESS", bar.getProgress());
+					startService(intent);
+					flag=false;
+				}
+				
+			}
+		});
 		if (intent.hasExtra("DATA") && intent.hasExtra("TITLE")) {
 
 			// String TITLE = intent.getStringExtra("TITLE");
 			String DATA = intent.getStringExtra("DATA");
 			Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
 		}
-
+      
+      
 		btnplay = (ImageButton) findViewById(R.id.btnplay);
 		MusicBroadCastReceive bll = new MusicBroadCastReceive();
 		IntentFilter filter = new IntentFilter("bktmkd.android.services.duration");
