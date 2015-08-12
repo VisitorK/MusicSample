@@ -28,141 +28,127 @@ import android.util.Log;
 import bktmkd.android.music.MainActivity;
 import bktmkd.android.services.MusicPlyerService;
 
-public class MusicLrcOnLine extends  AsyncTask {
-	
-
+public class MusicLrcOnLine extends AsyncTask{
 
 	@Override
 	protected Object doInBackground(Object... params) {
-		// TODO Auto-generated method stub
-		WriteLRC(params[0].toString(),params[1].toString());
+
+		WriteLRC(params[0].toString(), params[1].toString());
 		return null;
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	@Override
 	protected void onPostExecute(Object result) {
-		// TODO Auto-generated method stub
 		super.onPostExecute(result);
-		MusicPlyerService.DownLoadLRCSucess=true;
+		MusicPlyerService.DownLoadLRCSucess = true;
 	}
+
 	private static String TAG = "MuiscLrcOnLine";
 	private static MusicLrcOnLine instance;
 	public static final String lrcRootPath = Environment.getDownloadCacheDirectory().toString() + "/Lyrics/";
 	public static final String queryLrcAPI = "http://geci.me/api/lyric/";
 
 	public static MusicLrcOnLine getInstance() {
-	if(instance==null)
-	{
-		instance=new MusicLrcOnLine();
+		if (instance == null) {
+			instance = new MusicLrcOnLine();
+		}
+		return instance;
 	}
-	return instance;
+
+	public String getQueryLrcURL(String title) {
+		return queryLrcAPI + Encode(title);
 	}
-	
-	public String getQueryLrcURL(String title)
-	{
-		 return queryLrcAPI + Encode(title);
+
+	// 歌手，歌曲名中的空格进行转码
+	public String Encode(String str) {
+
+		try {
+			return URLEncoder.encode(str.trim(), "utf-8");
+		} catch (UnsupportedEncodingException e) {
+
+			e.printStackTrace();
+		}
+
+		return str;
+
 	}
-	  // 歌手，歌曲名中的空格进行转码
-	  public String Encode(String str) {
 
-	    try {
-	      return URLEncoder.encode(str.trim(), "utf-8");
-	    } catch (UnsupportedEncodingException e) {
-	   
-	      e.printStackTrace();
-	    }
+	// 获取歌词文件地址
+	public String getLrcURL(String title) {
 
-	    return str;
+		String queryLrcURLStr = getQueryLrcURL(title);
+		Log.d("bktmkd", queryLrcURLStr);
+		String lrcurl = "";
+		try {
+			URL url = new URL(queryLrcURLStr);
 
-	  }
-	  //获取歌词文件地址
-	  public String getLrcURL(String title)
-	  {
-		
-		  String queryLrcURLStr=getQueryLrcURL(title);
-		  Log.d("bktmkd", queryLrcURLStr);
-		  String lrcurl="";
-		  try
-		  {
-			  URL url=new URL(queryLrcURLStr);
-			
-			  URLConnection urlConnection=url.openConnection();
-			
-			  urlConnection.connect();
-			  Log.d("bktmkd", "aaaaaaaaaaaaaa");
-			  BufferedReader in=new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-			  StringBuilder sb=new StringBuilder();
-			  String temp;
-		
-			  while((temp=in.readLine())!=null)
-			  {
-				  sb.append(temp);
-			  }
-			  Log.d("bktmkd", sb.toString());
-			  JSONObject jObject=new JSONObject(sb.toString());
-			  int count=jObject.getInt("count");
-			  int index=count==0?0:1;
-			  JSONArray jArray=jObject.getJSONArray("result");
-			  JSONObject obj=jArray.getJSONObject(index);
-			  lrcurl= obj.getString("lrc");
-			  Log.d("bktmkd1", lrcurl);
-		  }
-		  catch (MalformedURLException e) {
-		      // TODO Auto-generated catch block
-		      e.printStackTrace();
-		    } catch (IOException e) {
-		      // TODO Auto-generated catch block
-		      e.printStackTrace();
-		    } catch (JSONException e) {
-		      // TODO Auto-generated catch block
-		      e.printStackTrace();
-		    }
-		  return lrcurl;
+			URLConnection urlConnection = url.openConnection();
 
-		 
-	  }
-	  //歌词文件网络地址，歌词文件本地地址
-	  public boolean WriteLRC(String title,String lrcPath)
-	  {
-		  boolean flag=false;
-		 String urlPath=getLrcURL(title);
-		
-		  try
-		  {
-		 URL url=new URL(urlPath);
-		 URLConnection urlConnection=url.openConnection();
-		 urlConnection.connect();
-		 HttpURLConnection httpConn=(HttpURLConnection) urlConnection;
-		 if(httpConn.getResponseCode()==HttpURLConnection.HTTP_OK)
-		 {
-			BufferedReader bf=new BufferedReader(new InputStreamReader(urlConnection.getInputStream(),"utf-8"));
-			PrintWriter out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lrcPath))));
-			char c[]=new char[256];
-			int temp=-1;
-			while((temp=bf.read())!=-1)
-			{
-				bf.read(c);
-				out.write(c);
+			urlConnection.connect();
+			Log.d("bktmkd", "aaaaaaaaaaaaaa");
+			BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
+			StringBuilder sb = new StringBuilder();
+			String temp;
+
+			while ((temp = in.readLine()) != null) {
+				sb.append(temp);
 			}
-			bf.close();
-			out.close();
-			flag=true;
-			
-		 }
-		  }
-		  catch(MalformedURLException e)
-		  {
-			  
-		  }
-		  catch (IOException e) {
-		      // TODO Auto-generated catch block
-		      e.printStackTrace();
-		    }
+			Log.d("bktmkd", sb.toString());
+			JSONObject jObject = new JSONObject(sb.toString());
+			int count = jObject.getInt("count");
+			int index = count == 0 ? 0 : 0;
+			JSONArray jArray = jObject.getJSONArray("result");
+			JSONObject obj = jArray.getJSONObject(index);
+			lrcurl = obj.getString("lrc");
+			Log.d("bktmkd1", lrcurl);
+		} catch (MalformedURLException e) {
 
-		  
-		 
-		  return flag;
-		  
-	  }
+			e.printStackTrace();
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		} catch (JSONException e) {
+
+			e.printStackTrace();
+		}
+		return lrcurl;
+
+	}
+
+	// 歌词文件网络地址，歌词文件本地地址
+	public boolean WriteLRC(String title, String lrcPath) {
+		boolean flag = false;
+		String urlPath = getLrcURL(title);
+
+		try {
+			URL url = new URL(urlPath);
+			URLConnection urlConnection = url.openConnection();
+			urlConnection.connect();
+			HttpURLConnection httpConn = (HttpURLConnection) urlConnection;
+			if (httpConn.getResponseCode() == HttpURLConnection.HTTP_OK) {
+				BufferedReader bf = new BufferedReader(new InputStreamReader(urlConnection.getInputStream(), "utf-8"));
+				PrintWriter out = new PrintWriter(
+						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lrcPath))));
+				char c[] = new char[256];
+				int temp = -1;
+				while ((temp = bf.read()) != -1) {
+					bf.read(c);
+					out.write(c);
+				}
+				bf.close();
+				out.close();
+				flag = true;
+
+			}
+		} catch (MalformedURLException e) {
+
+		} catch (IOException e) {
+
+			e.printStackTrace();
+		}
+
+		return flag;
+
+	}
 }

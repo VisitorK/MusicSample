@@ -48,7 +48,7 @@ public class MusicBaseAdapter extends BaseAdapter {
 		} else {
 			holder = (ViewHolder) convertView.getTag();
 		}
-		holder.img.setBackgroundResource(R.drawable.pause);
+		holder.img.setBackgroundResource(R.drawable.musicico);
 		holder.txt.setText(this.mycursor.getString(1));
 
 		return convertView;

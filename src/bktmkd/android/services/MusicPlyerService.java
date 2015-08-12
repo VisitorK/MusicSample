@@ -1,4 +1,5 @@
 package bktmkd.android.services;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
@@ -26,10 +27,10 @@ public class MusicPlyerService extends Service {
 	private MusicTimerTask mTimerTask;
 	public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration";
 	private MusicLrcProcess mLrcProcess; // 歌词处理
-	public static boolean DownLoadLRCSucess=false;
+	public static boolean DownLoadLRCSucess = false;
 	private List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); // 存放歌词列表对象
 	private int index = 0;
-	private String path="";
+	private String path = "";
 
 	@Override
 	public IBinder onBind(Intent intent) {
@@ -190,15 +191,15 @@ public class MusicPlyerService extends Service {
 
 	public void initLrc(String path) {
 
-		this.path=path;
+		this.path = path;
 		mLrcProcess = new MusicLrcProcess();
-		
+
 		// 读取歌词文件
-		mLrcProcess.readLRC(path,title);
-	
+		mLrcProcess.readLRC(path, title);
+
 		// 传回处理后的歌词文件
 		lrcList = mLrcProcess.getLrcList();
-		
+
 		// 设置歌词
 		MainActivity.lrcView.setMusicLrcContent(lrcList);
 
@@ -208,7 +209,8 @@ public class MusicPlyerService extends Service {
 
 		handler.post(mRunnable);
 	}
-     //注释掉这一段代码
+
+	// 注释掉这一段代码
 	Handler handler = new Handler();
 	Runnable mRunnable = new Runnable() {
 
@@ -216,10 +218,9 @@ public class MusicPlyerService extends Service {
 			MainActivity.lrcView.setIndex(lrcIndex());
 			MainActivity.lrcView.invalidate();
 			handler.postDelayed(mRunnable, 100);
-			if(DownLoadLRCSucess)
-			{
+			if (DownLoadLRCSucess) {
 				initLrc(path);
-				DownLoadLRCSucess=false;
+				DownLoadLRCSucess = false;
 			}
 		}
 	};
@@ -227,8 +228,7 @@ public class MusicPlyerService extends Service {
 	/**
 	 * 根据时间获取歌词显示的索引值
 	 * 
-	 * @return
-	 * 返回当前播放毫秒位置
+	 * @return 返回当前播放毫秒位置
 	 */
 	public int lrcIndex() {
 		int currentTime = 0;
@@ -255,18 +255,16 @@ public class MusicPlyerService extends Service {
 		return index;
 	}
 
-	//定时作业，获取音频当前播放位置，并广播出去
+	// 定时作业，获取音频当前播放位置，并广播出去
 	public class MusicTimerTask extends TimerTask {
 
 		@Override
 		public boolean cancel() {
-			// TODO Auto-generated method stub
 			return super.cancel();
 		}
 
 		@Override
 		public void run() {
-			// TODO Auto-generated method stub
 			if (!title.equals("")) {
 				Intent intet = new Intent(BROADCAST_COUNTER_DURATION);
 				intet.putExtra("DURATION", mPlayer.getDuration());
@@ -279,7 +277,6 @@ public class MusicPlyerService extends Service {
 
 		@Override
 		public long scheduledExecutionTime() {
-			// TODO Auto-generated method stub
 			return super.scheduledExecutionTime();
 		}
 
