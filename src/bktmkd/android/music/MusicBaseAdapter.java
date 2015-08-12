@@ -23,18 +23,15 @@ public class MusicBaseAdapter extends BaseAdapter {
 	}
 
 	public int getCount() {
-		// TODO Auto-generated method stub
 		this.mycursor=dbAdapter.queryALL();
 		return this.mycursor.getCount();
 	}
 
 	public Object getItem(int position) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	public long getItemId(int position) {
-		// TODO Auto-generated method stub
 		return 0;
 	}
 

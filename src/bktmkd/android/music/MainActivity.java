@@ -11,9 +11,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.widget.Button;
 import android.widget.ImageButton;
-import android.widget.ProgressBar;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
@@ -50,21 +48,20 @@ public class MainActivity extends Activity {
 		Intent intent = getIntent();
 		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 			
+			@SuppressWarnings("unused")
 			boolean flag=false;
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
 				flag=false;
 			}
 			
 			public void onStartTrackingTouch(SeekBar seekBar) {
-				// TODO Auto-generated method stub
 				flag=true;
 			}
 			
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				// TODO Auto-generated method stub
 				if(flag=true)
 				{
+					
 					Intent intent=new Intent(MainActivity.this, MusicPlyerService.class);
 					intent.putExtra("PROGRESS", bar.getProgress());
 					startService(intent);
@@ -113,7 +110,6 @@ public class MainActivity extends Activity {
 		findViewById(R.id.btnpre).setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
 				intentSV.putExtra("PRE", "PRE");
 				startService(intentSV);
@@ -124,7 +120,6 @@ public class MainActivity extends Activity {
 		findViewById(R.id.btnnext).setOnClickListener(new OnClickListener() {
 			
 			public void onClick(View v) {
-				// TODO Auto-generated method stub
 				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
 				intentSV.putExtra("NEXT", "NEXT");
 				startService(intentSV);
@@ -135,12 +130,10 @@ public class MainActivity extends Activity {
 	final ServiceConnection con = new ServiceConnection() {
 
 		public void onServiceDisconnected(ComponentName name) {
-			// TODO Auto-generated method stub
 			Toast.makeText(MainActivity.this, "MusicServiceActivity onSeviceDisconnected", Toast.LENGTH_SHORT).show();
 		}
 
 		public void onServiceConnected(ComponentName name, IBinder service) {
-			// TODO Auto-generated method stub
 			Toast.makeText(MainActivity.this, "MusicServiceActivity onSeviceDisconnected", Toast.LENGTH_SHORT).show();
 		}
 	};

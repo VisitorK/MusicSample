@@ -1,11 +1,8 @@
 package bktmkd.android.services;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
-
-import android.R;
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
@@ -15,7 +12,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-
 import bktmkd.android.db.DBAdapter;
 import bktmkd.android.music.MainActivity;
 import bktmkd.android.musiclrc.MusicLrcContent;
@@ -30,27 +26,24 @@ public class MusicPlyerService extends Service {
 	private MusicTimerTask mTimerTask;
 	public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration";
 	private MusicLrcProcess mLrcProcess; // 歌词处理
+	public static boolean DownLoadLRCSucess=false;
 	private List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); // 存放歌词列表对象
 	private int index = 0;
-	
+	private String path="";
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		// TODO Auto-generated method stub
 		mPlayer.start();
 		return null;
 	}
 
 	@Override
 	public void onCreate() {
-		// TODO Auto-generated method stub
 		Log.d(TAG, "CreateService");
 		super.onCreate();
 		mPlayer = new MediaPlayer();
 		mPlayer.setOnCompletionListener(new OnCompletionListener() {
-
 			public void onCompletion(MediaPlayer mp) {
-				// TODO Auto-generated method stub
 				DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
 				dbAdapter.getReadableDatabase();
 				int count = dbAdapter.GetCount();
@@ -65,18 +58,17 @@ public class MusicPlyerService extends Service {
 					title = c.getString(1);
 					mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 					mPlayer.start();
+					dbAdapter.close();
 				}
 			}
 		});
 		mTimer = new Timer(true);
 		mTimerTask = new MusicTimerTask();
 		mTimer.schedule(mTimerTask, 10, 500);
-
 	}
 
 	@Override
 	public void onDestroy() {
-		// TODO Auto-generated method stub
 		mPlayer.stop();
 		mTimerTask.cancel();
 		super.onDestroy();
@@ -85,7 +77,6 @@ public class MusicPlyerService extends Service {
 	@SuppressWarnings("deprecation")
 	@Override
 	public void onStart(Intent intent, int startId) {
-		// TODO Auto-generated method stub
 		super.onStart(intent, startId);
 		Intent musicIntent = intent;
 		// 播放列表点击播放
@@ -125,12 +116,12 @@ public class MusicPlyerService extends Service {
 					mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 					initLrc(c.getString(6));
 					mPlayer.start();
+					dbAdapter.close();
 				}
 			} else {
 				mPlayer.pause();
 			}
-	
-		
+
 		}
 		// 上一曲
 		else if (musicIntent.hasExtra("PRE")) {
@@ -138,16 +129,13 @@ public class MusicPlyerService extends Service {
 			int count = dbAdapter.GetCount();
 			dbAdapter.getReadableDatabase();
 			if (title.equals("")) {
-
 				// 如果播放的不是最后一首歌曲
 				if (count > 0) {
-
 					ID = 1;
 				}
 			} else {
 				if (ID == 1) {
 					ID = count;
-
 				} else {
 					ID = ID - 1;
 				}
@@ -160,6 +148,7 @@ public class MusicPlyerService extends Service {
 				initLrc(c.getString(6));
 				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 				mPlayer.start();
+				dbAdapter.close();
 			}
 		}
 		// 下一曲
@@ -171,17 +160,14 @@ public class MusicPlyerService extends Service {
 
 				// 如果播放的不是最后一首歌曲
 				if (count > 0) {
-
 					ID = 1;
 				}
 			} else {
 				if (ID == count) {
 					ID = 1;
-
 				} else {
 					ID = ID + 1;
 				}
-
 			}
 			Cursor c = dbAdapter.querybyID(ID);
 			if (c.moveToFirst()) {
@@ -190,6 +176,7 @@ public class MusicPlyerService extends Service {
 				initLrc(c.getString(6));
 				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
 				mPlayer.start();
+				dbAdapter.close();
 			}
 		}
 
@@ -197,36 +184,43 @@ public class MusicPlyerService extends Service {
 
 	@Override
 	public boolean onUnbind(Intent intent) {
-		// TODO Auto-generated method stub
 		mPlayer.stop();
 		return super.onUnbind(intent);
 	}
-	
+
 	public void initLrc(String path) {
+
+		this.path=path;
 		mLrcProcess = new MusicLrcProcess();
+		
 		// 读取歌词文件
-	mLrcProcess.readLRC(path);
+		mLrcProcess.readLRC(path,title);
 	
 		// 传回处理后的歌词文件
 		lrcList = mLrcProcess.getLrcList();
-	
+		
+		// 设置歌词
 		MainActivity.lrcView.setMusicLrcContent(lrcList);
-	
+
 		// 切换带动画显示歌词
-	//	MainActivity.lrcView.setAnimation(AnimationUtils.loadAnimation(MusicPlyerService.this, android.R.anim.anticipate_interpolator));
-	
+		// MainActivity.lrcView.setAnimation(AnimationUtils.loadAnimation(MusicPlyerService.this,
+		// android.R.anim.anticipate_interpolator));
+
 		handler.post(mRunnable);
 	}
-
+     //注释掉这一段代码
 	Handler handler = new Handler();
-
 	Runnable mRunnable = new Runnable() {
 
 		public void run() {
-		
 			MainActivity.lrcView.setIndex(lrcIndex());
 			MainActivity.lrcView.invalidate();
 			handler.postDelayed(mRunnable, 100);
+			if(DownLoadLRCSucess)
+			{
+				initLrc(path);
+				DownLoadLRCSucess=false;
+			}
 		}
 	};
 
@@ -234,36 +228,34 @@ public class MusicPlyerService extends Service {
 	 * 根据时间获取歌词显示的索引值
 	 * 
 	 * @return
+	 * 返回当前播放毫秒位置
 	 */
 	public int lrcIndex() {
-		int currentTime=0;
-		int	duration=0 ;
+		int currentTime = 0;
+		int duration = 0;
 		if (mPlayer.isPlaying()) {
-			 currentTime = mPlayer.getCurrentPosition();
-			 duration = mPlayer.getDuration();
+			currentTime = mPlayer.getCurrentPosition();
+			duration = mPlayer.getDuration();
 		}
-		  if(currentTime < duration) {  
-		        for (int i = 0; i < lrcList.size(); i++) {  
-		            if (i < lrcList.size() - 1) {  
-		                if (currentTime < lrcList.get(i).getLrcTime() && i == 0) {  
-		                    index = i;  
-		                }  
-		                if (currentTime > lrcList.get(i).getLrcTime()  
-		                        && currentTime < lrcList.get(i + 1).getLrcTime()) {  
-		                    index = i;  
-		                }  
-		            }  
-		            if (i == lrcList.size() - 1  
-		                    && currentTime > lrcList.get(i).getLrcTime()) {  
-		                index = i;  
-		            }  
-		        }  
-		    }  
-		    return index;  
-	
+		if (currentTime < duration) {
+			for (int i = 0; i < lrcList.size(); i++) {
+				if (i < lrcList.size() - 1) {
+					if (currentTime < lrcList.get(i).getLrcTime() && i == 0) {
+						index = i;
+					}
+					if (currentTime > lrcList.get(i).getLrcTime() && currentTime < lrcList.get(i + 1).getLrcTime()) {
+						index = i;
+					}
+				}
+				if (i == lrcList.size() - 1 && currentTime > lrcList.get(i).getLrcTime()) {
+					index = i;
+				}
+			}
+		}
+		return index;
+	}
 
-}
-
+	//定时作业，获取音频当前播放位置，并广播出去
 	public class MusicTimerTask extends TimerTask {
 
 		@Override
@@ -280,8 +272,6 @@ public class MusicPlyerService extends Service {
 				intet.putExtra("DURATION", mPlayer.getDuration());
 				intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
 				intet.putExtra("TITLE", title);
-				// Log.d("sendBroadcast",
-				// String.valueOf(mPlayer.getCurrentPosition()));
 				sendBroadcast(intet);
 
 			}
@@ -293,5 +283,5 @@ public class MusicPlyerService extends Service {
 			return super.scheduledExecutionTime();
 		}
 
-}
+	}
 }

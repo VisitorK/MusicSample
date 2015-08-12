@@ -30,21 +30,18 @@ public class MusicLrcView extends TextView {
 	public MusicLrcView(Context context) {
 		super(context);
 		 init();  
-		// TODO Auto-generated constructor stub
 	}
 
 	public MusicLrcView(Context context, AttributeSet attrs, int defStyle) {
 		super(context,attrs,defStyle);
 		 init();  
-		// TODO Auto-generated constructor stub
+
 	}
 	public MusicLrcView(Context context, AttributeSet attrs) {
 		super(context,attrs);
 		 init();  
-		// TODO Auto-generated constructor stub
 	}
 	private void init() {
-		// TODO Auto-generated method stub
 		  setFocusable(true);     //设置可对焦  
 	        //高亮部分  
 	        currentPaint = new Paint();  
@@ -60,18 +57,15 @@ public class MusicLrcView extends TextView {
 
 	@Override
 	protected void onDraw(Canvas canvas) {
-		// TODO Auto-generated method stub
 		super.onDraw(canvas);
 		 if(canvas == null) {  
 	            return;  
 	        }  
 	          
 	        currentPaint.setColor(Color.argb(210, 251, 248, 29));  
-	        notCurrentPaint.setColor(Color.argb(140, 255, 255, 255));  
-	          
+	        notCurrentPaint.setColor(Color.argb(140, 255, 255, 255));    
 	        currentPaint.setTextSize(24);  
 	        currentPaint.setTypeface(Typeface.SERIF);  
-	          
 	        notCurrentPaint.setTextSize(textSize);  
 	        notCurrentPaint.setTypeface(Typeface.DEFAULT);  
 	          

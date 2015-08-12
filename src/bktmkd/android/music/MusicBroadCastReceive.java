@@ -9,7 +9,6 @@ import android.os.Message;
 public class MusicBroadCastReceive extends BroadcastReceiver {
 	@Override
 	public void onReceive(Context context, Intent intent) {
-		// TODO Auto-generated method stub
 		Intent inte=intent;
 		if(inte.hasExtra("DURATION"))
 		{
