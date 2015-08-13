@@ -28,25 +28,27 @@ import android.util.Log;
 import bktmkd.android.music.MainActivity;
 import bktmkd.android.services.MusicPlyerService;
 
-public class MusicLrcOnLine extends AsyncTask{
+public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 
 	@Override
-	protected Object doInBackground(Object... params) {
-
+	protected Boolean doInBackground(String... params) {
 		WriteLRC(params[0].toString(), params[1].toString());
-		return null;
+		return true;
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	protected void onPostExecute(Object result) {
+	protected void onProgressUpdate(Integer... values) {
+		super.onProgressUpdate(values);
+		Log.d("bktmkd", String.valueOf(values[0]));
+		MainActivity.musicTitle.setText(String.valueOf(values[0]));
+	}
+
+	@Override
+	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
 		MusicPlyerService.DownLoadLRCSucess = true;
 	}
-
-	private static String TAG = "MuiscLrcOnLine";
 	private static MusicLrcOnLine instance;
-	public static final String lrcRootPath = Environment.getDownloadCacheDirectory().toString() + "/Lyrics/";
 	public static final String queryLrcAPI = "http://geci.me/api/lyric/";
 
 	public static MusicLrcOnLine getInstance() {
@@ -82,15 +84,11 @@ public class MusicLrcOnLine extends AsyncTask{
 		String lrcurl = "";
 		try {
 			URL url = new URL(queryLrcURLStr);
-
 			URLConnection urlConnection = url.openConnection();
-
 			urlConnection.connect();
-			Log.d("bktmkd", "aaaaaaaaaaaaaa");
 			BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
 			StringBuilder sb = new StringBuilder();
 			String temp;
-
 			while ((temp = in.readLine()) != null) {
 				sb.append(temp);
 			}

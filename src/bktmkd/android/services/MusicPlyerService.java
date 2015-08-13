@@ -271,7 +271,6 @@ public class MusicPlyerService extends Service {
 				intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
 				intet.putExtra("TITLE", title);
 				sendBroadcast(intet);
-
 			}
 		}
 

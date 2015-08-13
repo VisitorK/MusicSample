@@ -26,6 +26,11 @@
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar" >
         </activity>
+             <activity
+            android:name=".MusicSearchActivity"
+            android:label="@string/app_name"
+            android:theme="@android:style/Theme.NoTitleBar" >
+        </activity>
          <service android:name="bktmkd.android.services.MusicPlyerService"/>
     </application>
 </manifest>

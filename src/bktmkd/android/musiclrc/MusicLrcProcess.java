@@ -19,7 +19,6 @@ public class MusicLrcProcess {
 	}
 
 	// 在音频相同位置获取音频歌词
-	@SuppressWarnings("unchecked")
 	public String readLRC(String path,String title) {
 		StringBuilder stringBuilder = new StringBuilder();
 		File f = new File(path.replace(".mp3", ".lrc"));
@@ -27,7 +26,6 @@ public class MusicLrcProcess {
 		{
 			MusicLrcOnLine _MusicLrcOnLine=new MusicLrcOnLine();
 		    _MusicLrcOnLine.execute(title, path.replace(".mp3", ".lrc"));
-		    
 		}
 		else
 		{
