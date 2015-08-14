@@ -1,143 +1,167 @@
 package com.bktmkd.music;
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+import com.bktmkd.musicdb.MusicDBAdapter;
+import com.bktmkd.musicdb.MusicModel;
 import com.bktmkd.musiclrc.MusicLrcView;
 import com.bktmkd.musicservice.MusicPlyerService;
+import com.bktmkd.musicservice.MusicPlyerService.MusicSampleBinder;
 
 import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
-import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
-import android.widget.Toast;
+import android.widget.SeekBar.OnSeekBarChangeListener;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
 	/** Called when the activity is first created. */
-	public static ImageButton btnplay;
-	public static boolean PlayFlag = false;
-	public static SeekBar bar;
-	public static TextView startTime;
-	public static TextView endTime;
-	public static TextView musicTitle;
-	public static MusicHandler musicHandler;
-	public static MusicLrcView lrcView;
+	private ImageButton btnstartstop;
+	private ImageButton btnnext;
+	private ImageButton btnprevious;
+	private ImageButton btnList;
+	private SeekBar bar;
+	private TextView startTime;
+	private TextView endTime;
+	private TextView musicTitle;
+	private MusicLrcView lrcView;
+	private List<MusicModel> musicList = new ArrayList<MusicModel>();
+	private int currentMusic;
+	private int currentPosition;
+	private int currentMax;
+	private ProgressReceiver progressReceiver;
+	private MusicSampleBinder musicSampleBinder;
+
+	private ServiceConnection serviceConnection = new ServiceConnection() {
+		public void onServiceDisconnected(ComponentName name) {
+		}
+
+		public void onServiceConnected(ComponentName name, IBinder service) {
+			musicSampleBinder = (MusicSampleBinder) service;
+		}
+	};
+
+	private void connectToMusicPlayerService() {
+		Intent intent = new Intent(MainActivity.this, MusicPlyerService.class);
+		bindService(intent, serviceConnection, BIND_AUTO_CREATE);
+	}
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
+		MusicDBAdapter dbAdapter = new MusicDBAdapter(MainActivity.this);
+		dbAdapter.getReadableDatabase();
+		Cursor musicCursor = dbAdapter.queryALL();
+		musicList.clear();
+		if (musicCursor.moveToFirst()) {
+			MusicModel model = new MusicModel();
+			while (musicCursor.moveToNext()) {
+
+				model.set_id(musicCursor.getInt(0));
+				model.setTITLE(musicCursor.getString(1));
+				model.setDURATION(musicCursor.getString(2));
+				model.setARTIST(musicCursor.getString(3));
+				model.set_MusicID(musicCursor.getString(4));
+				model.setDISPLAY_NAME(musicCursor.getString(5));
+				model.setDATA(musicCursor.getString(6));
+				musicList.add(model);
+			}
+		}
+		dbAdapter.close();
+		connectToMusicPlayerService();
 		bar = (SeekBar) findViewById(R.id.progressbar1);
 		startTime = (TextView) findViewById(R.id.textView1);
 		endTime = (TextView) findViewById(R.id.textView2);
 		musicTitle = (TextView) findViewById(R.id.textViewtitle);
 		lrcView = (MusicLrcView) findViewById(R.id.lrcShowView);
-		Animation mAnimationRight = AnimationUtils.loadAnimation(MainActivity.this, android.R.anim.slide_in_left);
-		lrcView.setAnimation(mAnimationRight);
+		btnstartstop = (ImageButton) findViewById(R.id.btnplay);
+		btnnext = (ImageButton) findViewById(R.id.btnnext);
+		btnprevious = (ImageButton) findViewById(R.id.btnpre);
+		btnList=(ImageButton)findViewById(R.id.btnoperate);
+		btnnext.setOnClickListener(this);
+		btnprevious.setOnClickListener(this);
+		btnstartstop.setOnClickListener(this);
+		btnList.setOnClickListener(this);
 
-		findViewById(R.id.btnsearch).setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-			
-			}
-		});
-		musicHandler = new MusicHandler();
-		Intent intent = getIntent();
 		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
-			@SuppressWarnings("unused")
-			boolean flag = false;
-
 			public void onStopTrackingTouch(SeekBar seekBar) {
-				flag = false;
 			}
 
 			public void onStartTrackingTouch(SeekBar seekBar) {
-				flag = true;
 			}
 
 			public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-				if (flag = true) {
-
-					Intent intent = new Intent(MainActivity.this, MusicPlyerService.class);
-					intent.putExtra("PROGRESS", bar.getProgress());
-					startService(intent);
-					flag = false;
+				if (fromUser) {
+					musicSampleBinder.changeProgress(progress);
 				}
-
 			}
 		});
-		if (intent.hasExtra("DATA") && intent.hasExtra("TITLE")) {
 
-			// String TITLE = intent.getStringExtra("TITLE");
-			String DATA = intent.getStringExtra("DATA");
-			Toast.makeText(this, DATA, Toast.LENGTH_LONG).show();
-		}
-
-		btnplay = (ImageButton) findViewById(R.id.btnplay);
-		MusicBroadCastReceive bll = new MusicBroadCastReceive();
-		IntentFilter filter = new IntentFilter("bktmkd.android.services.duration");
-		registerReceiver(bll, filter);
-		btnplay.setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				if (PlayFlag) {
-					btnplay.setBackgroundResource(R.drawable.play);
-					Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
-					intentSV.putExtra("STOP", "STOP");
-					stopService(intentSV);
-				} else {
-					btnplay.setBackgroundResource(R.drawable.pause);
-					Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
-					intentSV.putExtra("START", "START");
-					startService(intentSV);
-				}
-				PlayFlag = !PlayFlag;
-			}
-		});
-		ImageButton btn1 = (ImageButton) findViewById(R.id.btnoperate);
-		btn1.setOnClickListener(new OnClickListener() {
-			public void onClick(View v) {
-				startActivity(new Intent(MainActivity.this, MusicListActivity.class));
-			}
-		});
-		// 上一曲
-		findViewById(R.id.btnpre).setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
-				intentSV.putExtra("PRE", "PRE");
-				startService(intentSV);
-
-			}
-		});
-		// 下一曲
-		findViewById(R.id.btnnext).setOnClickListener(new OnClickListener() {
-
-			public void onClick(View v) {
-				Intent intentSV = new Intent(MainActivity.this, MusicPlyerService.class);
-				intentSV.putExtra("NEXT", "NEXT");
-				startService(intentSV);
-			}
-		});
 	}
 
-	final ServiceConnection con = new ServiceConnection() {
+	public void onClick(View v) {
 
-		public void onServiceDisconnected(ComponentName name) {
-			Toast.makeText(MainActivity.this, "MusicServiceActivity onSeviceDisconnected", Toast.LENGTH_SHORT).show();
+		switch (v.getId()) {
+		case R.id.btnplay:
+			play(currentMusic, R.id.btnplay);
+		
+			break;
+		case R.id.btnnext:
+			musicSampleBinder.toNext();
+			break;
+		case R.id.btnpre:
+			musicSampleBinder.toPrevious();
+			break;
+		case R.id.btnoperate:
+			Intent intent=new Intent(MainActivity.this, MusicListActivity.class);
+			startActivity(intent);
+			
+		}
+	}
+
+	private void play(int position, int resId) {
+		if (musicSampleBinder.isPlaying()) {
+			musicSampleBinder.stopPlay();
+			btnstartstop.setBackgroundResource(R.drawable.play);
+		} else {
+			musicSampleBinder.startPlay(position, currentPosition);
+			btnstartstop.setBackgroundResource(R.drawable.pause);
+		}
+	}
+
+	class ProgressReceiver extends BroadcastReceiver {
+
+		@Override
+		public void onReceive(Context context, Intent intent) {
+			String action = intent.getAction();
+			if (MusicPlyerService.ACTION_UPDATE_PROGRESS.equals(action)) {
+				int progress = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_PROGRESS, 0);
+				if (progress > 0) {
+					currentPosition = progress;
+					bar.setProgress(progress / 1000);
+				}
+			} else if (MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC.equals(action)) {
+				currentMusic = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+				musicTitle.setText(musicList.get(currentMusic).getTITLE());
+			} else if (MusicPlyerService.ACTION_UPDATE_DURATION.equals(action)) {
+				currentMax = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_DURATION, 0);
+				bar.setMax(currentMax / 1000);
+			}
 		}
 
-		public void onServiceConnected(ComponentName name, IBinder service) {
-			Toast.makeText(MainActivity.this, "MusicServiceActivity onSeviceDisconnected", Toast.LENGTH_SHORT).show();
-		}
-	};
+
+	}
 }

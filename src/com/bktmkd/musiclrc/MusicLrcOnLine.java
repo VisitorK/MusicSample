@@ -35,13 +35,13 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 	protected void onProgressUpdate(Integer... values) {
 		super.onProgressUpdate(values);
 		Log.d("bktmkd", String.valueOf(values[0]));
-		MainActivity.musicTitle.setText(String.valueOf(values[0]));
+	//	MainActivity.musicTitle.setText(String.valueOf(values[0]));
 	}
 
 	@Override
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
-		MusicPlyerService.DownLoadLRCSucess = true;
+	//	MusicPlyerService.DownLoadLRCSucess = true;
 	}
 	private static MusicLrcOnLine instance;
 	public static final String queryLrcAPI = "http://geci.me/api/lyric/";

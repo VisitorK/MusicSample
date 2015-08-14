@@ -124,7 +124,7 @@
         android:layout_alignParentLeft="true" >
     </RelativeLayout>
 
-    <bktmkd.android.musiclrc.MusicLrcView
+    <com.bktmkd.musiclrc.MusicLrcView
         android:id="@+id/lrcShowView"
         android:layout_width="match_parent"
         android:layout_height="400dip"

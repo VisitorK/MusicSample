@@ -2,284 +2,303 @@ package com.bktmkd.musicservice;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
 
 import com.bktmkd.music.MainActivity;
+import com.bktmkd.music.R;
 import com.bktmkd.musicdb.MusicDBAdapter;
-import com.bktmkd.musiclrc.MusicLrcContent;
-import com.bktmkd.musiclrc.MusicLrcProcess;
+import com.bktmkd.musicdb.MusicModel;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.database.Cursor;
+import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
-import android.net.Uri;
+import android.media.MediaPlayer.OnPreparedListener;
+import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
+import android.os.Message;
+import android.provider.MediaStore;
 import android.util.Log;
 
 public class MusicPlyerService extends Service {
-	private static String TAG = "MusicService";
-	private int ID = 1;
-	public String title = "";
-	private MediaPlayer mPlayer;
-	private Timer mTimer;
-	private MusicTimerTask mTimerTask;
-	public final static String BROADCAST_COUNTER_DURATION = "bktmkd.android.services.duration";
-	private MusicLrcProcess mLrcProcess; // 歌词处理
-	public static boolean DownLoadLRCSucess = false;
-	private List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); // 存放歌词列表对象
-	private int index = 0;
-	private String path = "";
 
-	@Override
-	public IBinder onBind(Intent intent) {
-		mPlayer.start();
-		return null;
-	}
+	private static final String TAG = "com.bktmkd.music.NATURE_SERVICE";
 
-	@Override
-	public void onCreate() {
-		Log.d(TAG, "CreateService");
-		super.onCreate();
-		mPlayer = new MediaPlayer();
-		mPlayer.setOnCompletionListener(new OnCompletionListener() {
-			public void onCompletion(MediaPlayer mp) {
-				MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
-				dbAdapter.getReadableDatabase();
-				int count = dbAdapter.GetCount();
-				// 如果播放的不是最后一首歌曲
-				if (count > ID) {
-					ID = ID + 1;
-				} else {
-					ID = 1;
-				}
-				Cursor c = dbAdapter.querybyID(ID);
-				if (c.moveToFirst()) {
-					title = c.getString(1);
-					mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
-					mPlayer.start();
-					dbAdapter.close();
-				}
-			}
-		});
-		mTimer = new Timer(true);
-		mTimerTask = new MusicTimerTask();
-		mTimer.schedule(mTimerTask, 10, 500);
-	}
+	public static final String MUSICS = "com.bktmkd.music.MUSIC_LIST";
 
-	@Override
-	public void onDestroy() {
-		mPlayer.stop();
-		mTimerTask.cancel();
-		super.onDestroy();
-	}
+	public static final String NATURE_SERVICE = "com.bktmkd.music.NatureService";
 
-	@SuppressWarnings("deprecation")
-	@Override
-	public void onStart(Intent intent, int startId) {
-		super.onStart(intent, startId);
-		Intent musicIntent = intent;
-		// 播放列表点击播放
-		if (musicIntent.hasExtra("DATA") && musicIntent.hasExtra("TITLE")) {
-			title = intent.getStringExtra("TITLE");
-			ID = Integer.parseInt(intent.getStringExtra("ID"));
-			String DATA = musicIntent.getStringExtra("DATA");
-			mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(DATA));
-			mPlayer.start();
+	private MediaPlayer mediaPlayer;
 
-		}
-		// 进度条拖动位置播放
-		else if (!title.equals("") && musicIntent.hasExtra("PROGRESS")) {
-			int progress = (int) (((double) (mPlayer.getDuration())) * (double) (musicIntent.getIntExtra("PROGRESS", 0))
-					/ (double) 100);
-			mPlayer.seekTo(progress);
-		}
-		// 暂停
-		else if (musicIntent.hasExtra("STOP")) {
-			mPlayer.pause();
+	private boolean isPlaying = false;
 
-		}
-		// 播放
-		else if (musicIntent.hasExtra("START")) {
-			if (title.equals("")) {
-				MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
-				dbAdapter.getReadableDatabase();
-				int count = dbAdapter.GetCount();
-				// 如果播放的不是最后一首歌曲
-				if (count > 0) {
+	private List<MusicModel> musicList = new ArrayList<MusicModel>();
+	private Binder MusicSampleBinder = new MusicSampleBinder();
 
-					ID = 1;
-				}
-				Cursor c = dbAdapter.querybyID(ID);
-				if (c.moveToFirst()) {
-					title = c.getString(1);
-					mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
-					initLrc(c.getString(6));
-					mPlayer.start();
-					dbAdapter.close();
-				}
-			} else {
-				mPlayer.pause();
-			}
+	private int currentMusic;
+	private int currentPosition;
 
-		}
-		// 上一曲
-		else if (musicIntent.hasExtra("PRE")) {
-			MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
-			int count = dbAdapter.GetCount();
-			dbAdapter.getReadableDatabase();
-			if (title.equals("")) {
-				// 如果播放的不是最后一首歌曲
-				if (count > 0) {
-					ID = 1;
-				}
-			} else {
-				if (ID == 1) {
-					ID = count;
-				} else {
-					ID = ID - 1;
-				}
+	private static final int updateProgress = 1;
+	private static final int updateCurrentMusic = 2;
+	private static final int updateDuration = 3;
 
-			}
-			Cursor c = dbAdapter.querybyID(ID);
-			if (c.moveToFirst()) {
-				title = c.getString(1);
-				mPlayer.reset();
-				initLrc(c.getString(6));
-				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
-				mPlayer.start();
-				dbAdapter.close();
-			}
-		}
-		// 下一曲
-		else if (musicIntent.hasExtra("NEXT")) {
-			MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
-			int count = dbAdapter.GetCount();
-			dbAdapter.getReadableDatabase();
-			if (title.equals("")) {
+	public static final String ACTION_UPDATE_PROGRESS = "com.bktmkd.music.UPDATE_PROGRESS";
+	public static final String ACTION_UPDATE_DURATION = "com.bktmkd.music.UPDATE_DURATION";
+	public static final String ACTION_UPDATE_CURRENT_MUSIC = "com.bktmkd.music.UPDATE_CURRENT_MUSIC";
 
-				// 如果播放的不是最后一首歌曲
-				if (count > 0) {
-					ID = 1;
-				}
-			} else {
-				if (ID == count) {
-					ID = 1;
-				} else {
-					ID = ID + 1;
-				}
-			}
-			Cursor c = dbAdapter.querybyID(ID);
-			if (c.moveToFirst()) {
-				title = c.getString(1);
-				mPlayer.reset();
-				initLrc(c.getString(6));
-				mPlayer = MediaPlayer.create(getApplicationContext(), Uri.parse(c.getString(6)));
-				mPlayer.start();
-				dbAdapter.close();
-			}
-		}
+	private Notification notification;
 
-	}
+	private Handler handler = new Handler() {
 
-	@Override
-	public boolean onUnbind(Intent intent) {
-		mPlayer.stop();
-		return super.onUnbind(intent);
-	}
-
-	public void initLrc(String path) {
-
-		this.path = path;
-		mLrcProcess = new MusicLrcProcess();
-
-		// 读取歌词文件
-		mLrcProcess.readLRC(path, title);
-
-		// 传回处理后的歌词文件
-		lrcList = mLrcProcess.getLrcList();
-
-		// 设置歌词
-		MainActivity.lrcView.setMusicLrcContent(lrcList);
-
-		// 切换带动画显示歌词
-		// MainActivity.lrcView.setAnimation(AnimationUtils.loadAnimation(MusicPlyerService.this,
-		// android.R.anim.anticipate_interpolator));
-
-		handler.post(mRunnable);
-	}
-
-	// 注释掉这一段代码
-	Handler handler = new Handler();
-	Runnable mRunnable = new Runnable() {
-
-		public void run() {
-			MainActivity.lrcView.setIndex(lrcIndex());
-			MainActivity.lrcView.invalidate();
-			handler.postDelayed(mRunnable, 100);
-			if (DownLoadLRCSucess) {
-				initLrc(path);
-				DownLoadLRCSucess = false;
+		public void handleMessage(Message msg) {
+			switch (msg.what) {
+			case updateProgress:
+				toUpdateProgress();
+				break;
+			case updateDuration:
+				toUpdateDuration();
+				break;
+			case updateCurrentMusic:
+				toUpdateCurrentMusic();
+				break;
 			}
 		}
 	};
 
+	// 更新进度广播
+	private void toUpdateProgress() {
+		if (mediaPlayer != null && isPlaying) {
+			int progress = mediaPlayer.getCurrentPosition();
+			Intent intent = new Intent();
+			intent.setAction(ACTION_UPDATE_PROGRESS);
+			intent.putExtra(ACTION_UPDATE_PROGRESS, progress);
+			sendBroadcast(intent);
+			handler.sendEmptyMessageDelayed(updateProgress, 1000);
+		}
+	}
+
+	// 更新当前歌曲长度广播
+	private void toUpdateDuration() {
+		if (mediaPlayer != null) {
+			int duration = mediaPlayer.getDuration();
+			Intent intent = new Intent();
+			intent.setAction(ACTION_UPDATE_DURATION);
+			intent.putExtra(ACTION_UPDATE_DURATION, duration);
+			sendBroadcast(intent);
+		}
+	}
+
+	// 更新歌曲当前播放进度广播
+	private void toUpdateCurrentMusic() {
+		Intent intent = new Intent();
+		intent.setAction(ACTION_UPDATE_CURRENT_MUSIC);
+		intent.putExtra(ACTION_UPDATE_CURRENT_MUSIC, currentMusic);
+		sendBroadcast(intent);
+	}
+
+	// service创建后执行
+	public void onCreate() {
+		initMediaPlayer();
+		MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
+		dbAdapter.getReadableDatabase();
+		Cursor musicCursor = dbAdapter.queryALL();
+		if(musicCursor.getCount()<1)
+		{
+		musicCursor=this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+				new String[]{MediaStore.Audio.Media.TITLE,
+						MediaStore.Audio.Media.DURATION,
+						MediaStore.Audio.Media.ARTIST,
+						MediaStore.Audio.Media._ID,
+						MediaStore.Audio.Media.DISPLAY_NAME,
+						MediaStore.Audio.Media.DATA}, 
+				null, null, null);
+		if(musicCursor.moveToFirst())
+		{
+		for (int i = 0; i < musicCursor.getCount(); i++) {
+			musicCursor.moveToPosition(i);
+			ContentValues values = new ContentValues();
+			values.put("TITLE", musicCursor.getString(0));
+			values.put("DURATION", musicCursor.getString(1));
+			values.put("ARTIST", musicCursor.getString(2));
+			values.put("_MusicID", musicCursor.getString(3));
+			values.put("DISPLAY_NAME", musicCursor.getString(4));
+			values.put("DATA", musicCursor.getString(5));
+			dbAdapter.insert(values);
+		}
+		}
+		}
+		musicList.clear();
+		if (musicCursor.moveToFirst()) {
+			MusicModel model = new MusicModel();
+			while (musicCursor.moveToNext()) {
+
+				model.set_id(musicCursor.getInt(0));
+				model.setTITLE(musicCursor.getString(1));
+				model.setDURATION(musicCursor.getString(2));
+				model.setARTIST(musicCursor.getString(3));
+				model.set_MusicID(musicCursor.getString(4));
+				model.setDISPLAY_NAME(musicCursor.getString(5));
+				model.setDATA(musicCursor.getString(6));
+				musicList.add(model);
+			}
+		}
+		dbAdapter.close();
+		Log.v(TAG, "OnCreate");
+		super.onCreate();
+
+	/*	Intent intent = new Intent(this, MainActivity.class);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
+		notification = new Notification.Builder(this).setTicker("Nature").setSmallIcon(R.drawable.music_app)
+				.setContentTitle("Playing").setContentText(musicList.get(currentMusic).getTITLE())
+				.setContentIntent(pendingIntent).getNotification();
+		notification.flags |= Notification.FLAG_NO_CLEAR;
+
+		startForeground(1, notification);*/
+
+	}
+
+	// 停止service时执行
+	public void onDestroy() {
+		if (mediaPlayer != null) {
+			mediaPlayer.release();
+			mediaPlayer = null;
+		}
+	}
+
 	/**
-	 * 根据时间获取歌词显示的索引值
-	 * 
-	 * @return 返回当前播放毫秒位置
+	 * 初始化service
 	 */
-	public int lrcIndex() {
-		int currentTime = 0;
-		int duration = 0;
-		if (mPlayer.isPlaying()) {
-			currentTime = mPlayer.getCurrentPosition();
-			duration = mPlayer.getDuration();
-		}
-		if (currentTime < duration) {
-			for (int i = 0; i < lrcList.size(); i++) {
-				if (i < lrcList.size() - 1) {
-					if (currentTime < lrcList.get(i).getLrcTime() && i == 0) {
-						index = i;
-					}
-					if (currentTime > lrcList.get(i).getLrcTime() && currentTime < lrcList.get(i + 1).getLrcTime()) {
-						index = i;
-					}
+	private void initMediaPlayer() {
+		mediaPlayer = new MediaPlayer();
+		mediaPlayer.setAudioStreamType(AudioManager.STREAM_MUSIC);
+		mediaPlayer.setOnPreparedListener(new OnPreparedListener() {
+			public void onPrepared(MediaPlayer mp) {
+				mediaPlayer.start();
+				mediaPlayer.seekTo(currentPosition);
+				handler.sendEmptyMessage(updateDuration);
+			}
+		});
+		mediaPlayer.setOnCompletionListener(new OnCompletionListener() {
+			public void onCompletion(MediaPlayer mp) {
+				if (isPlaying) {
+
+					playNext();
+
 				}
-				if (i == lrcList.size() - 1 && currentTime > lrcList.get(i).getLrcTime()) {
-					index = i;
+
+			}
+
+		});
+	}
+
+	// 设置当前播放进度
+	private void setCurrentMusic(int pCurrentMusic) {
+		currentMusic = pCurrentMusic;
+		handler.sendEmptyMessage(updateCurrentMusic);
+	}
+
+	//
+	private void play(int currentMusic, int pCurrentPosition) {
+		currentPosition = pCurrentPosition;
+		setCurrentMusic(currentMusic);
+		mediaPlayer.reset();
+		try {
+			
+			mediaPlayer.setDataSource(musicList.get(currentMusic).getDATA());
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		Log.v(TAG, "[Play] Start Preparing at " + currentMusic);
+		mediaPlayer.prepareAsync();
+		handler.sendEmptyMessage(updateProgress);
+
+		isPlaying = true;
+	}
+
+	private void stop() {
+		mediaPlayer.stop();
+		isPlaying = false;
+	}
+
+	private void playNext() {
+
+		if (currentMusic + 1 == musicList.size()) {
+			play(0, 0);
+		} else {
+			play(currentMusic + 1, 0);
+		}
+
+	}
+
+	private void playPrevious() {
+
+		if (currentMusic - 1 < 0) {
+			play(musicList.size() - 1, 0);
+		} else {
+			play(currentMusic - 1, 0);
+		}
+
+	}
+
+	@Override
+	public IBinder onBind(Intent intent) {
+		
+		return MusicSampleBinder;
+	}
+
+	public class MusicSampleBinder extends Binder {
+
+		public void startPlay(int currentMusic, int currentPosition) {
+		
+			play(currentMusic, currentPosition);
+		}
+
+		public void stopPlay() {
+			stop();
+		}
+
+		public void toNext() {
+			playNext();
+		}
+
+		public void toPrevious() {
+			playPrevious();
+		}
+
+		public boolean isPlaying() {
+			return isPlaying;
+		}
+
+		/**
+		 * 更新提醒
+		 */
+		public void notifyActivity() {
+			toUpdateCurrentMusic();
+			toUpdateDuration();
+		}
+
+		/**
+		 * Seekbar changes
+		 * 
+		 * @param progress
+		 */
+		public void changeProgress(int progress) {
+			if (mediaPlayer != null) {
+				currentPosition = progress * 1000;
+				if (isPlaying) {
+					mediaPlayer.seekTo(currentPosition);
+				} else {
+					play(currentMusic, currentPosition);
 				}
 			}
 		}
-		return index;
 	}
 
-	// 定时作业，获取音频当前播放位置，并广播出去
-	public class MusicTimerTask extends TimerTask {
-
-		@Override
-		public boolean cancel() {
-			return super.cancel();
-		}
-
-		@Override
-		public void run() {
-			if (!title.equals("")) {
-				Intent intet = new Intent(BROADCAST_COUNTER_DURATION);
-				intet.putExtra("DURATION", mPlayer.getDuration());
-				intet.putExtra("CURRENTDURATION", mPlayer.getCurrentPosition());
-				intet.putExtra("TITLE", title);
-				sendBroadcast(intet);
-			}
-		}
-
-		@Override
-		public long scheduledExecutionTime() {
-			return super.scheduledExecutionTime();
-		}
-
-	}
 }
