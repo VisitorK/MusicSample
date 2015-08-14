@@ -4,36 +4,40 @@
     android:layout_height="fill_parent"
     android:background="@drawable/bg"
     android:orientation="vertical" >
-
-    <RelativeLayout
+    <LinearLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:background="@color/maintop"
         android:orientation="horizontal" >
+        <EditText
+            android:id="@+id/editText1"
+            android:layout_width="0dp"
+            android:layout_height="33dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginTop="4dp"
+            android:layout_weight="1"
+            android:ems="10"
+            android:hint="@string/btnSearchhint"
+            android:textSize="13sp" >
+        </EditText>
         <ImageButton
             android:id="@+id/btnsearch1"
             android:layout_width="wrap_content"
             android:layout_height="33dp"
-            android:layout_alignParentRight="true"
+            android:layout_marginTop="4dp"
             android:background="@drawable/local_music_scan_icon_normal"
             android:contentDescription="@string/btnsearchDES" />
-        <EditText
-            android:id="@+id/editText1"
-            android:layout_width="wrap_content"
-            android:layout_height="33dp"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginTop="4dp"
-            android:layout_marginLeft="5dp"
-            android:layout_toLeftOf="@+id/btnsearch"
-               android:hint="@string/btnSearchhint"
-               android:textSize="13sp"
-            android:ems="10" >
-        </EditText>
-
-    </RelativeLayout>
-
-
-
+    </LinearLayout>
+    <LinearLayout 
+         android:layout_width="fill_parent"
+         android:layout_height="wrap_content"
+          >
+   <ListView 
+       android:id="@+id/listviewsearch"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+       ></ListView>
+    </LinearLayout>
+  
 </RelativeLayout>

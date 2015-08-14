@@ -2,8 +2,6 @@ package bktmkd.android.musiclrc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.EOFException;
-import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -15,15 +13,10 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.net.URLEncoder;
-import java.util.Random;
-
-import org.apache.http.message.BufferedHeader;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import android.os.AsyncTask;
-import android.os.Environment;
 import android.util.Log;
 import bktmkd.android.music.MainActivity;
 import bktmkd.android.services.MusicPlyerService;
@@ -129,6 +122,7 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 				PrintWriter out = new PrintWriter(
 						new BufferedWriter(new OutputStreamWriter(new FileOutputStream(lrcPath))));
 				char c[] = new char[256];
+				@SuppressWarnings("unused")
 				int temp = -1;
 				while ((temp = bf.read()) != -1) {
 					bf.read(c);
