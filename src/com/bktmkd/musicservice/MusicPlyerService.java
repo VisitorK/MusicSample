@@ -18,6 +18,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.MediaPlayer.OnCompletionListener;
 import android.media.MediaPlayer.OnPreparedListener;
+import android.net.Uri;
 import android.os.Binder;
 import android.os.Handler;
 import android.os.IBinder;
@@ -50,7 +51,6 @@ public class MusicPlyerService extends Service {
 	public static final String ACTION_UPDATE_PROGRESS = "com.bktmkd.music.UPDATE_PROGRESS";
 	public static final String ACTION_UPDATE_DURATION = "com.bktmkd.music.UPDATE_DURATION";
 	public static final String ACTION_UPDATE_CURRENT_MUSIC = "com.bktmkd.music.UPDATE_CURRENT_MUSIC";
-
 
 	private Notification notification;
 
@@ -108,36 +108,33 @@ public class MusicPlyerService extends Service {
 		MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
 		dbAdapter.getReadableDatabase();
 		Cursor musicCursor = dbAdapter.queryALL();
-		if(musicCursor.getCount()<1)
-		{
-		musicCursor=this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-				new String[]{MediaStore.Audio.Media.TITLE,
-						MediaStore.Audio.Media.DURATION,
-						MediaStore.Audio.Media.ARTIST,
-						MediaStore.Audio.Media._ID,
-						MediaStore.Audio.Media.DISPLAY_NAME,
-						MediaStore.Audio.Media.DATA}, 
-				null, null, null);
-		if(musicCursor.moveToFirst())
-		{
-		for (int i = 0; i < musicCursor.getCount(); i++) {
-			musicCursor.moveToPosition(i);
-			ContentValues values = new ContentValues();
-			values.put("TITLE", musicCursor.getString(0));
-			values.put("DURATION", musicCursor.getString(1));
-			values.put("ARTIST", musicCursor.getString(2));
-			values.put("_MusicID", musicCursor.getString(3));
-			values.put("DISPLAY_NAME", musicCursor.getString(4));
-			values.put("DATA", musicCursor.getString(5));
-			dbAdapter.insert(values);
-		}
-		}
+		if (musicCursor.getCount() < 1) {
+			musicCursor = this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+					new String[] { MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DURATION,
+							MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media._ID,
+							MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA },
+					null, null, null);
+			if (musicCursor.moveToFirst()) {
+				for (int i = 0; i < musicCursor.getCount(); i++) {
+					musicCursor.moveToPosition(i);
+					ContentValues values = new ContentValues();
+					values.put("TITLE", musicCursor.getString(0));
+					values.put("DURATION", musicCursor.getString(1));
+					values.put("ARTIST", musicCursor.getString(2));
+					values.put("_MusicID", musicCursor.getString(3));
+					values.put("DISPLAY_NAME", musicCursor.getString(4));
+					values.put("DATA", musicCursor.getString(5));
+					dbAdapter.insert(values);
+				}
+			}
 		}
 		musicList.clear();
 		if (musicCursor.moveToFirst()) {
 			MusicModel model = new MusicModel();
-			while (musicCursor.moveToNext()) {
-
+			for(int i=0;i<musicCursor.getCount();i++) {
+				musicCursor.moveToPosition(i);
+				model = null;
+				model = new MusicModel();
 				model.set_id(musicCursor.getInt(0));
 				model.setTITLE(musicCursor.getString(1));
 				model.setDURATION(musicCursor.getString(2));
@@ -152,16 +149,21 @@ public class MusicPlyerService extends Service {
 		Log.v(TAG, "OnCreate");
 		super.onCreate();
 
-	/*	Intent intent = new Intent(this, MainActivity.class);
-		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-
-		PendingIntent pendingIntent = PendingIntent.getActivity(this, 0, intent, 0);
-		notification = new Notification.Builder(this).setTicker("Nature").setSmallIcon(R.drawable.music_app)
-				.setContentTitle("Playing").setContentText(musicList.get(currentMusic).getTITLE())
-				.setContentIntent(pendingIntent).getNotification();
-		notification.flags |= Notification.FLAG_NO_CLEAR;
-
-		startForeground(1, notification);*/
+		/*
+		 * Intent intent = new Intent(this, MainActivity.class);
+		 * intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP |
+		 * Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		 * 
+		 * PendingIntent pendingIntent = PendingIntent.getActivity(this, 0,
+		 * intent, 0); notification = new
+		 * Notification.Builder(this).setTicker("Nature").setSmallIcon(R.
+		 * drawable.music_app)
+		 * .setContentTitle("Playing").setContentText(musicList.get(currentMusic
+		 * ).getTITLE()) .setContentIntent(pendingIntent).getNotification();
+		 * notification.flags |= Notification.FLAG_NO_CLEAR;
+		 * 
+		 * startForeground(1, notification);
+		 */
 
 	}
 
@@ -211,7 +213,7 @@ public class MusicPlyerService extends Service {
 		setCurrentMusic(currentMusic);
 		mediaPlayer.reset();
 		try {
-			
+		
 			mediaPlayer.setDataSource(musicList.get(currentMusic).getDATA());
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -219,7 +221,6 @@ public class MusicPlyerService extends Service {
 		Log.v(TAG, "[Play] Start Preparing at " + currentMusic);
 		mediaPlayer.prepareAsync();
 		handler.sendEmptyMessage(updateProgress);
-
 		isPlaying = true;
 	}
 
@@ -250,14 +251,14 @@ public class MusicPlyerService extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		
+
 		return MusicSampleBinder;
 	}
 
 	public class MusicSampleBinder extends Binder {
 
 		public void startPlay(int currentMusic, int currentPosition) {
-		
+
 			play(currentMusic, currentPosition);
 		}
 

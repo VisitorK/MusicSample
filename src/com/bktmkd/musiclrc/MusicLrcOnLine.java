@@ -22,12 +22,13 @@ import com.bktmkd.musicservice.MusicPlyerService;
 
 import android.os.AsyncTask;
 import android.util.Log;
+import android.view.animation.AnimationUtils;
 
 public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 
 	@Override
 	protected Boolean doInBackground(String... params) {
-		WriteLRC(params[0].toString(), params[1].toString());
+		WriteLRC(params[0].toString(), params[1].toString(),params[2].toString());
 		return true;
 	}
 
@@ -41,7 +42,13 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 	@Override
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
-	//	MusicPlyerService.DownLoadLRCSucess = true;
+	MainActivity.musicProcess = new MusicLrcProcess();  
+        //读取歌词文件  
+	MainActivity.musicProcess.readLRC(MainActivity.musicList.get(MainActivity.currentMusic).getDATA(),MainActivity.musicList.get(MainActivity.currentMusic).getTITLE(),MainActivity.musicList.get(MainActivity.currentMusic).getARTIST());  
+        //传回处理后的歌词文件  
+	MainActivity.lrcList = MainActivity.musicProcess.getLrcList();  
+	MainActivity.lrcView.setMusicLrcContent(MainActivity.lrcList);  
+        //切换带动画显示歌词  
 	}
 	private static MusicLrcOnLine instance;
 	public static final String queryLrcAPI = "http://geci.me/api/lyric/";
@@ -53,8 +60,9 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 		return instance;
 	}
 
-	public String getQueryLrcURL(String title) {
-		return queryLrcAPI + Encode(title);
+	public String getQueryLrcURL(String title,String artist) {
+		return queryLrcAPI + Encode(title)+"/"+Encode(artist);
+		
 	}
 
 	// 歌手，歌曲名中的空格进行转码
@@ -72,9 +80,9 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 	}
 
 	// 获取歌词文件地址
-	public String getLrcURL(String title) {
+	public String getLrcURL(String title,String artist) {
 
-		String queryLrcURLStr = getQueryLrcURL(title);
+		String queryLrcURLStr = getQueryLrcURL(title,artist);
 		Log.d("bktmkd", queryLrcURLStr);
 		String lrcurl = "";
 		try {
@@ -110,9 +118,9 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 	}
 
 	// 歌词文件网络地址，歌词文件本地地址
-	public boolean WriteLRC(String title, String lrcPath) {
+	public boolean WriteLRC(String title, String lrcPath,String artist) {
 		boolean flag = false;
-		String urlPath = getLrcURL(title);
+		String urlPath = getLrcURL(title,artist);
 
 		try {
 			URL url = new URL(urlPath);

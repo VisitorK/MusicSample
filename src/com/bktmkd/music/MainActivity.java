@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import com.bktmkd.musicdb.MusicDBAdapter;
 import com.bktmkd.musicdb.MusicModel;
+import com.bktmkd.musiclrc.MusicLrcContent;
+import com.bktmkd.musiclrc.MusicLrcProcess;
 import com.bktmkd.musiclrc.MusicLrcView;
 import com.bktmkd.musicservice.MusicPlyerService;
 import com.bktmkd.musicservice.MusicPlyerService.MusicSampleBinder;
@@ -21,6 +23,7 @@ import android.os.Bundle;
 import android.os.IBinder;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -36,13 +39,16 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView startTime;
 	private TextView endTime;
 	private TextView musicTitle;
-	private MusicLrcView lrcView;
-	private List<MusicModel> musicList = new ArrayList<MusicModel>();
-	private int currentMusic;
+	public static MusicLrcView lrcView;
+	public static List<MusicModel> musicList = new ArrayList<MusicModel>();
+	public static int currentMusic;
 	private int currentPosition;
 	private int currentMax;
 	private ProgressReceiver progressReceiver;
 	private MusicSampleBinder musicSampleBinder;
+	public static MusicLrcProcess musicProcess;
+	public static List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); //存放歌词列表对象  
+	public static int index = 0; 
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
@@ -68,8 +74,10 @@ public class MainActivity extends Activity implements OnClickListener {
 		musicList.clear();
 		if (musicCursor.moveToFirst()) {
 			MusicModel model = new MusicModel();
-			while (musicCursor.moveToNext()) {
-
+			for(int i=0;i<musicCursor.getCount();i++){
+				musicCursor.moveToPosition(i);
+				model = null;
+				model = new MusicModel();
 				model.set_id(musicCursor.getInt(0));
 				model.setTITLE(musicCursor.getString(1));
 				model.setDURATION(musicCursor.getString(2));
@@ -153,20 +161,51 @@ public class MainActivity extends Activity implements OnClickListener {
 				if (progress > 0) {
 					currentPosition = progress;
 					startTime.setText(getTimeFromInt(currentPosition));
-					
+					 lrcView.setIndex(lrcIndex(currentPosition,currentMax));  
+			          lrcView.invalidate();  
+
 					bar.setProgress(progress / 1000);
 				}
 			} else if (MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC.equals(action)) {
 				currentMusic = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+				
 				musicTitle.setText(musicList.get(currentMusic).getTITLE());
+				musicProcess = new MusicLrcProcess();  
+			        //读取歌词文件  
+				musicProcess.readLRC(musicList.get(currentMusic).getDATA(),musicList.get(currentMusic).getTITLE(),musicList.get(currentMusic).getARTIST());  
+			        //传回处理后的歌词文件  
+			        lrcList = musicProcess.getLrcList();  
+			        lrcView.setMusicLrcContent(lrcList);  
+			        //切换带动画显示歌词  
+			        lrcView.setAnimation(AnimationUtils.loadAnimation(MainActivity.this,android.R.anim.fade_in));  
 			} else if (MusicPlyerService.ACTION_UPDATE_DURATION.equals(action)) {
 				currentMax = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_DURATION, 0);
-		     	endTime.setText(getTimeFromInt(currentMax));
+				endTime.setText(getTimeFromInt(currentMax));
 				bar.setMax(currentMax / 1000);
 			}
 		}
 
 	}
+	public int lrcIndex(int currentTime,int duration) {  
+	    if(currentTime < duration) {  
+	        for (int i = 0; i < lrcList.size(); i++) {  
+	            if (i < lrcList.size() - 1) {  
+	                if (currentTime < lrcList.get(i).getLrcTime() && i == 0) {  
+	                    index = i;  
+	                }  
+	                if (currentTime > lrcList.get(i).getLrcTime()  
+	                        && currentTime < lrcList.get(i + 1).getLrcTime()) {  
+	                    index = i;  
+	                }  
+	            }  
+	            if (i == lrcList.size() - 1  
+	                    && currentTime > lrcList.get(i).getLrcTime()) {  
+	                index = i;  
+	            }  
+	        }  
+	    }  
+	    return index;  
+	}  
 
 	private void registerReceiver() {
 		progressReceiver = new ProgressReceiver();
@@ -177,15 +216,15 @@ public class MainActivity extends Activity implements OnClickListener {
 		registerReceiver(progressReceiver, intentFilter);
 	}
 
-	public   String getTimeFromInt(int time) {
-		if (time <= 0)
-		 {return "0:00";}
-		else{
-			int secondnd = (time/1000)/60;
+	public String getTimeFromInt(int time) {
+		if (time <= 0) {
+			return "0:00";
+		} else {
+			int secondnd = (time / 1000) / 60;
 			int million = (time / 1000) % 60;
-			String f = String.valueOf(secondnd);
-			String m = million >= 10? String.valueOf(million) : "0"+ String.valueOf(million);
+			String f =secondnd>=10? String.valueOf(secondnd):"0" + String.valueOf(secondnd);
+			String m = million >= 10 ? String.valueOf(million) : "0" + String.valueOf(million);
 			return f + ":" + m;
-			}
+		}
 	}
 }

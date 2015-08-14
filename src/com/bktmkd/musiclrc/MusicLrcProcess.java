@@ -19,13 +19,13 @@ public class MusicLrcProcess {
 	}
 
 	// 在音频相同位置获取音频歌词
-	public String readLRC(String path,String title) {
+	public String readLRC(String path,String title,String artist) {
 		StringBuilder stringBuilder = new StringBuilder();
 		File f = new File(path.replace(".mp3", ".lrc"));
 		if(!f.exists())
 		{
 			MusicLrcOnLine _MusicLrcOnLine=new MusicLrcOnLine();
-		    _MusicLrcOnLine.execute(title, path.replace(".mp3", ".lrc"));
+		    _MusicLrcOnLine.execute(title, path.replace(".mp3", ".lrc"),artist);
 		}
 		else
 		{
