@@ -51,6 +51,7 @@ public class MusicPlyerService extends Service {
 	public static final String ACTION_UPDATE_DURATION = "com.bktmkd.music.UPDATE_DURATION";
 	public static final String ACTION_UPDATE_CURRENT_MUSIC = "com.bktmkd.music.UPDATE_CURRENT_MUSIC";
 
+
 	private Notification notification;
 
 	private Handler handler = new Handler() {

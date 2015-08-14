@@ -14,6 +14,7 @@ import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.database.Cursor;
 import android.os.Bundle;
@@ -89,12 +90,12 @@ public class MainActivity extends Activity implements OnClickListener {
 		btnstartstop = (ImageButton) findViewById(R.id.btnplay);
 		btnnext = (ImageButton) findViewById(R.id.btnnext);
 		btnprevious = (ImageButton) findViewById(R.id.btnpre);
-		btnList=(ImageButton)findViewById(R.id.btnoperate);
+		btnList = (ImageButton) findViewById(R.id.btnoperate);
 		btnnext.setOnClickListener(this);
 		btnprevious.setOnClickListener(this);
 		btnstartstop.setOnClickListener(this);
 		btnList.setOnClickListener(this);
-
+		registerReceiver();
 		bar.setOnSeekBarChangeListener(new OnSeekBarChangeListener() {
 
 			public void onStopTrackingTouch(SeekBar seekBar) {
@@ -117,7 +118,7 @@ public class MainActivity extends Activity implements OnClickListener {
 		switch (v.getId()) {
 		case R.id.btnplay:
 			play(currentMusic, R.id.btnplay);
-		
+
 			break;
 		case R.id.btnnext:
 			musicSampleBinder.toNext();
@@ -126,9 +127,9 @@ public class MainActivity extends Activity implements OnClickListener {
 			musicSampleBinder.toPrevious();
 			break;
 		case R.id.btnoperate:
-			Intent intent=new Intent(MainActivity.this, MusicListActivity.class);
+			Intent intent = new Intent(MainActivity.this, MusicListActivity.class);
 			startActivity(intent);
-			
+
 		}
 	}
 
@@ -151,6 +152,8 @@ public class MainActivity extends Activity implements OnClickListener {
 				int progress = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_PROGRESS, 0);
 				if (progress > 0) {
 					currentPosition = progress;
+					startTime.setText(getTimeFromInt(currentPosition));
+					
 					bar.setProgress(progress / 1000);
 				}
 			} else if (MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC.equals(action)) {
@@ -158,10 +161,31 @@ public class MainActivity extends Activity implements OnClickListener {
 				musicTitle.setText(musicList.get(currentMusic).getTITLE());
 			} else if (MusicPlyerService.ACTION_UPDATE_DURATION.equals(action)) {
 				currentMax = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_DURATION, 0);
+		     	endTime.setText(getTimeFromInt(currentMax));
 				bar.setMax(currentMax / 1000);
 			}
 		}
 
+	}
 
+	private void registerReceiver() {
+		progressReceiver = new ProgressReceiver();
+		IntentFilter intentFilter = new IntentFilter();
+		intentFilter.addAction(MusicPlyerService.ACTION_UPDATE_PROGRESS);
+		intentFilter.addAction(MusicPlyerService.ACTION_UPDATE_DURATION);
+		intentFilter.addAction(MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC);
+		registerReceiver(progressReceiver, intentFilter);
+	}
+
+	public   String getTimeFromInt(int time) {
+		if (time <= 0)
+		 {return "0:00";}
+		else{
+			int secondnd = (time/1000)/60;
+			int million = (time / 1000) % 60;
+			String f = String.valueOf(secondnd);
+			String m = million >= 10? String.valueOf(million) : "0"+ String.valueOf(million);
+			return f + ":" + m;
+			}
 	}
 }
