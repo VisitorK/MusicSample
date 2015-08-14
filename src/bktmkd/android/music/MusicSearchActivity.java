@@ -88,10 +88,6 @@ public class MusicSearchActivity extends Activity {
 					String musicfile=decodecontent.split("\\?")[0];
 					String sub=musicfile.split("\\.")[0];
 					String url1=encodecontent.split(sub)[0];
-					Log.d("bktmkd", encodecontent);
-					Log.d("bktmkd", decodecontent);
-					Log.d("bktmkd", "@@@@@@@@@@@@@@@@@@@@@@@@@"+sub);
-					Log.d("bktmkd", url1);
 					Log.d("bktmkd", url1+musicfile);
 
 				}
