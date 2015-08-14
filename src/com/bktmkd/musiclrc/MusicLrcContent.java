@@ -1,4 +1,4 @@
-package bktmkd.android.musiclrc;
+package com.bktmkd.musiclrc;
 
 public class MusicLrcContent {
 

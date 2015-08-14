@@ -1,4 +1,4 @@
-package bktmkd.android.musiclrc;
+package com.bktmkd.musiclrc;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,10 +16,12 @@ import java.net.URLEncoder;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import com.bktmkd.music.MainActivity;
+import com.bktmkd.musicservice.MusicPlyerService;
+
 import android.os.AsyncTask;
 import android.util.Log;
-import bktmkd.android.music.MainActivity;
-import bktmkd.android.services.MusicPlyerService;
 
 public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 

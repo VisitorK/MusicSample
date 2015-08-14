@@ -1,4 +1,4 @@
-package bktmkd.android.db;
+package com.bktmkd.musicdb;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteDatabase.CursorFactory;
 import android.database.sqlite.SQLiteOpenHelper;
 
-public class DBAdapter extends SQLiteOpenHelper {	      
+public class MusicDBAdapter extends SQLiteOpenHelper {	      
 	private final static int VERSION = 1;
 	private final static String DB_NAME = "musicdata.db";
 	private final static String TABLE_NAME = "music";
@@ -15,18 +15,18 @@ public class DBAdapter extends SQLiteOpenHelper {
 	private SQLiteDatabase db;
 
 	//SQLiteOpenHelper子类必须要的一个构造函数
-	public DBAdapter(Context context, String name, CursorFactory factory,int version) {
+	public MusicDBAdapter(Context context, String name, CursorFactory factory,int version) {
 		//必须通过super 调用父类的构造函数
 		super(context, name, factory, version);
 	}
 	
 	//数据库的构造函数，传递三个参数的
-	public DBAdapter(Context context, String name, int version){
+	public MusicDBAdapter(Context context, String name, int version){
 		this(context, name, null, version);
 	}
 	
 	//数据库的构造函数，传递一个参数的， 数据库名字和版本号都写死了
-	public DBAdapter(Context context){
+	public MusicDBAdapter(Context context){
 
 		this(context, DB_NAME, null, VERSION);
 

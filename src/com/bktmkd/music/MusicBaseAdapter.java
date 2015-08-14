@@ -1,5 +1,7 @@
-package bktmkd.android.music;
+package com.bktmkd.music;
 
+
+import com.bktmkd.musicdb.MusicDBAdapter;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -9,14 +11,13 @@ import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
-import bktmkd.android.db.DBAdapter;
 
 public class MusicBaseAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
 	private Cursor mycursor;
-    private DBAdapter  dbAdapter;
-	public MusicBaseAdapter(Context context,DBAdapter _dbAdapter) {
+    private MusicDBAdapter  dbAdapter;
+	public MusicBaseAdapter(Context context,MusicDBAdapter _dbAdapter) {
 		super();
 		this.dbAdapter=_dbAdapter;
 		this.mInflater = LayoutInflater.from(context);

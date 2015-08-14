@@ -1,4 +1,7 @@
-package bktmkd.android.music;
+package com.bktmkd.music;
+
+import com.bktmkd.musiclrc.MusicLrcView;
+import com.bktmkd.musicservice.MusicPlyerService;
 
 import android.app.Activity;
 import android.content.ComponentName;
@@ -16,9 +19,6 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 import android.widget.TextView;
 import android.widget.Toast;
-import bktmkd.android.music.R;
-import bktmkd.android.musiclrc.MusicLrcView;
-import bktmkd.android.services.MusicPlyerService;
 
 public class MainActivity extends Activity {
 	/** Called when the activity is first created. */
@@ -46,8 +46,7 @@ public class MainActivity extends Activity {
 		findViewById(R.id.btnsearch).setOnClickListener(new OnClickListener() {
 
 			public void onClick(View v) {
-				Intent intent = new Intent(MainActivity.this, MusicSearchActivity.class);
-				startActivity(intent);
+			
 			}
 		});
 		musicHandler = new MusicHandler();

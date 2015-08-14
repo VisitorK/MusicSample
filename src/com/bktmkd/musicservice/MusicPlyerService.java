@@ -1,9 +1,15 @@
-package bktmkd.android.services;
+package com.bktmkd.musicservice;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+
+import com.bktmkd.music.MainActivity;
+import com.bktmkd.musicdb.MusicDBAdapter;
+import com.bktmkd.musiclrc.MusicLrcContent;
+import com.bktmkd.musiclrc.MusicLrcProcess;
+
 import android.app.Service;
 import android.content.Intent;
 import android.database.Cursor;
@@ -13,10 +19,6 @@ import android.net.Uri;
 import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
-import bktmkd.android.db.DBAdapter;
-import bktmkd.android.music.MainActivity;
-import bktmkd.android.musiclrc.MusicLrcContent;
-import bktmkd.android.musiclrc.MusicLrcProcess;
 
 public class MusicPlyerService extends Service {
 	private static String TAG = "MusicService";
@@ -45,7 +47,7 @@ public class MusicPlyerService extends Service {
 		mPlayer = new MediaPlayer();
 		mPlayer.setOnCompletionListener(new OnCompletionListener() {
 			public void onCompletion(MediaPlayer mp) {
-				DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
+				MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
 				dbAdapter.getReadableDatabase();
 				int count = dbAdapter.GetCount();
 				// 如果播放的不是最后一首歌曲
@@ -103,7 +105,7 @@ public class MusicPlyerService extends Service {
 		// 播放
 		else if (musicIntent.hasExtra("START")) {
 			if (title.equals("")) {
-				DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
+				MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
 				dbAdapter.getReadableDatabase();
 				int count = dbAdapter.GetCount();
 				// 如果播放的不是最后一首歌曲
@@ -126,7 +128,7 @@ public class MusicPlyerService extends Service {
 		}
 		// 上一曲
 		else if (musicIntent.hasExtra("PRE")) {
-			DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
+			MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
 			int count = dbAdapter.GetCount();
 			dbAdapter.getReadableDatabase();
 			if (title.equals("")) {
@@ -154,7 +156,7 @@ public class MusicPlyerService extends Service {
 		}
 		// 下一曲
 		else if (musicIntent.hasExtra("NEXT")) {
-			DBAdapter dbAdapter = new DBAdapter(MusicPlyerService.this);
+			MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
 			int count = dbAdapter.GetCount();
 			dbAdapter.getReadableDatabase();
 			if (title.equals("")) {

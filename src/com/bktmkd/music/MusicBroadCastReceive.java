@@ -1,4 +1,4 @@
-package bktmkd.android.music;
+package com.bktmkd.music;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;

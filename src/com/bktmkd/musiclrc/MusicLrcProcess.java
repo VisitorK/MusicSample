@@ -1,4 +1,4 @@
-package bktmkd.android.musiclrc;
+package com.bktmkd.musiclrc;
 
 import java.io.BufferedReader;
 import java.io.File;

@@ -1,4 +1,4 @@
-package bktmkd.android.musiclrc;
+package com.bktmkd.musiclrc;
 
 import java.util.ArrayList;
 import java.util.List;

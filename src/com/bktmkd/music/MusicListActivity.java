@@ -1,4 +1,7 @@
-package bktmkd.android.music;
+package com.bktmkd.music;
+
+import com.bktmkd.musicdb.MusicDBAdapter;
+import com.bktmkd.musicservice.MusicPlyerService;
 
 import android.app.Activity;
 import android.content.ContentValues;
@@ -11,17 +14,16 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 import android.widget.TextView;
-import bktmkd.android.db.DBAdapter;
-import bktmkd.android.services.MusicPlyerService;
+
 
 public class MusicListActivity extends Activity {
-	private DBAdapter dbAdapter;
+	private MusicDBAdapter dbAdapter;
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		setContentView(R.layout.activity_musiclist);
 		super.onCreate(savedInstanceState);
 		ListView list=(ListView)findViewById(R.id.listView1);
-		dbAdapter=new DBAdapter(this);
+		dbAdapter=new MusicDBAdapter(this);
 		dbAdapter.getReadableDatabase();
 		Cursor musicCursor=null;
 		if(dbAdapter.queryALL().getCount()<1)
