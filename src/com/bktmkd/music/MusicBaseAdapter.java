@@ -1,10 +1,8 @@
 package com.bktmkd.music;
 
-
-import com.bktmkd.musicdb.MusicDBAdapter;
-
+import java.util.ArrayList;
+import com.bktmkd.musicdb.MusicModel;
 import android.content.Context;
-import android.database.Cursor;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,17 +13,17 @@ import android.widget.TextView;
 public class MusicBaseAdapter extends BaseAdapter {
 
 	private LayoutInflater mInflater;
-	private Cursor mycursor;
-    private MusicDBAdapter  dbAdapter;
-	public MusicBaseAdapter(Context context,MusicDBAdapter _dbAdapter) {
+	private ArrayList<MusicModel> data;
+
+	public MusicBaseAdapter(Context context, ArrayList<MusicModel> list) {
 		super();
-		this.dbAdapter=_dbAdapter;
+		this.data = list;
 		this.mInflater = LayoutInflater.from(context);
 	}
 
 	public int getCount() {
-		this.mycursor=dbAdapter.queryALL();
-		return this.mycursor.getCount();
+
+		return this.data.size();
 	}
 
 	public Object getItem(int position) {
@@ -38,7 +36,6 @@ public class MusicBaseAdapter extends BaseAdapter {
 
 	public View getView(int position, View convertView, ViewGroup parent) {
 		ViewHolder holder;
-		this.mycursor.moveToPosition(position);
 		if (convertView == null) {
 
 			convertView = mInflater.inflate(R.layout.item_music, null);
@@ -50,7 +47,7 @@ public class MusicBaseAdapter extends BaseAdapter {
 			holder = (ViewHolder) convertView.getTag();
 		}
 		holder.img.setBackgroundResource(R.drawable.musicico);
-		holder.txt.setText(this.mycursor.getString(1));
+		holder.txt.setText(this.data.get(position).getTITLE());
 
 		return convertView;
 	}

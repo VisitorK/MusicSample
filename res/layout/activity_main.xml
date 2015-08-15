@@ -8,15 +8,17 @@
     <RelativeLayout
         android:id="@+id/relativeLayout1"
         android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
         android:background="@color/maintop"
+         android:layout_height="35dp"
         android:orientation="horizontal" >
 
         <ImageButton
             android:id="@+id/btnoperate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@drawable/local_music_control_songs_icon_normal"
+            android:background="@drawable/musicico"
+            android:layout_marginTop="7dp"
+              android:layout_marginLeft="5dp"
             android:contentDescription="@string/btnoperateDES" />
 
         <TextView
@@ -26,15 +28,8 @@
             android:layout_centerHorizontal="true"
             android:layout_centerInParent="true"
             android:layout_centerVertical="true"
+            android:textColor="@android:color/white"
             android:text="" />
-
-        <ImageButton
-            android:id="@+id/btnsearch"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
-            android:background="@drawable/local_music_scan_icon_normal"
-            android:contentDescription="@string/btnsearchDES" />
     </RelativeLayout>
     <RelativeLayout
         android:id="@+id/relativeLayout2"

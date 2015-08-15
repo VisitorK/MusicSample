@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MusicSmaple</string>
-    <string name="btnoperateDES">设置按钮</string>
+    <string name="btnoperateDES">音乐列表</string>
     <string name="btnsearchDES">搜索按钮</string>
     <string name="btnSearchhint">请输入要搜索的歌曲名</string>
+     <string name="exit">退出程序</string>
     
 </resources>

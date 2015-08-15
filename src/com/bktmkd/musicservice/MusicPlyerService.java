@@ -38,7 +38,6 @@ public class MusicPlyerService extends Service {
 
 	private boolean isPlaying = false;
 
-	private List<MusicModel> musicList = new ArrayList<MusicModel>();
 	private Binder MusicSampleBinder = new MusicSampleBinder();
 
 	private int currentMusic;
@@ -105,47 +104,11 @@ public class MusicPlyerService extends Service {
 	// service创建后执行
 	public void onCreate() {
 		initMediaPlayer();
-		MusicDBAdapter dbAdapter = new MusicDBAdapter(MusicPlyerService.this);
-		dbAdapter.getReadableDatabase();
-		Cursor musicCursor = dbAdapter.queryALL();
-		if (musicCursor.getCount() < 1) {
-			musicCursor = this.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-					new String[] { MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DURATION,
-							MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media._ID,
-							MediaStore.Audio.Media.DISPLAY_NAME, MediaStore.Audio.Media.DATA },
-					null, null, null);
-			if (musicCursor.moveToFirst()) {
-				for (int i = 0; i < musicCursor.getCount(); i++) {
-					musicCursor.moveToPosition(i);
-					ContentValues values = new ContentValues();
-					values.put("TITLE", musicCursor.getString(0));
-					values.put("DURATION", musicCursor.getString(1));
-					values.put("ARTIST", musicCursor.getString(2));
-					values.put("_MusicID", musicCursor.getString(3));
-					values.put("DISPLAY_NAME", musicCursor.getString(4));
-					values.put("DATA", musicCursor.getString(5));
-					dbAdapter.insert(values);
-				}
-			}
-		}
-		musicList.clear();
-		if (musicCursor.moveToFirst()) {
-			MusicModel model = new MusicModel();
-			for(int i=0;i<musicCursor.getCount();i++) {
-				musicCursor.moveToPosition(i);
-				model = null;
-				model = new MusicModel();
-				model.set_id(musicCursor.getInt(0));
-				model.setTITLE(musicCursor.getString(1));
-				model.setDURATION(musicCursor.getString(2));
-				model.setARTIST(musicCursor.getString(3));
-				model.set_MusicID(musicCursor.getString(4));
-				model.setDISPLAY_NAME(musicCursor.getString(5));
-				model.setDATA(musicCursor.getString(6));
-				musicList.add(model);
-			}
-		}
-		dbAdapter.close();
+	if(MusicDBAdapter.musicList==null)
+	{
+		MusicDBAdapter.LoadDataFromDB(MusicPlyerService.this);
+		
+	}
 		Log.v(TAG, "OnCreate");
 		super.onCreate();
 
@@ -214,7 +177,7 @@ public class MusicPlyerService extends Service {
 		mediaPlayer.reset();
 		try {
 		
-			mediaPlayer.setDataSource(musicList.get(currentMusic).getDATA());
+			mediaPlayer.setDataSource(MusicDBAdapter.musicList.get(currentMusic).getDATA());
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -231,7 +194,7 @@ public class MusicPlyerService extends Service {
 
 	private void playNext() {
 
-		if (currentMusic + 1 == musicList.size()) {
+		if (currentMusic + 1 == MusicDBAdapter.musicList.size()) {
 			play(0, 0);
 		} else {
 			play(currentMusic + 1, 0);
@@ -242,7 +205,7 @@ public class MusicPlyerService extends Service {
 	private void playPrevious() {
 
 		if (currentMusic - 1 < 0) {
-			play(musicList.size() - 1, 0);
+			play(MusicDBAdapter.musicList.size() - 1, 0);
 		} else {
 			play(currentMusic - 1, 0);
 		}
@@ -278,6 +241,10 @@ public class MusicPlyerService extends Service {
 			return isPlaying;
 		}
 
+		public void close()
+		{
+			onDestroy();
+		}
 		/**
 		 * 更新提醒
 		 */

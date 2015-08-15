@@ -1,10 +1,8 @@
 package com.bktmkd.music;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import com.bktmkd.musicdb.MusicDBAdapter;
-import com.bktmkd.musicdb.MusicModel;
 import com.bktmkd.musiclrc.MusicLrcContent;
 import com.bktmkd.musiclrc.MusicLrcProcess;
 import com.bktmkd.musiclrc.MusicLrcView;
@@ -18,9 +16,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.database.Cursor;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.animation.AnimationUtils;
@@ -40,7 +39,6 @@ public class MainActivity extends Activity implements OnClickListener {
 	private TextView endTime;
 	private TextView musicTitle;
 	public static MusicLrcView lrcView;
-	public static List<MusicModel> musicList = new ArrayList<MusicModel>();
 	public static int currentMusic;
 	private int currentPosition;
 	private int currentMax;
@@ -49,6 +47,24 @@ public class MainActivity extends Activity implements OnClickListener {
 	public static MusicLrcProcess musicProcess;
 	public static List<MusicLrcContent> lrcList = new ArrayList<MusicLrcContent>(); //存放歌词列表对象  
 	public static int index = 0; 
+
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// TODO Auto-generated method stub
+		  menu.add(0, 1, 1, R.string.exit).setIcon(R.drawable.exit);  
+		return super.onCreateOptionsMenu(menu);
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		if(item.getItemId()==1)
+		{
+			musicSampleBinder.close();
+			this.finish();
+		}
+		return super.onOptionsItemSelected(item);
+	}
 
 	private ServiceConnection serviceConnection = new ServiceConnection() {
 		public void onServiceDisconnected(ComponentName name) {
@@ -68,27 +84,10 @@ public class MainActivity extends Activity implements OnClickListener {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		MusicDBAdapter dbAdapter = new MusicDBAdapter(MainActivity.this);
-		dbAdapter.getReadableDatabase();
-		Cursor musicCursor = dbAdapter.queryALL();
-		musicList.clear();
-		if (musicCursor.moveToFirst()) {
-			MusicModel model = new MusicModel();
-			for(int i=0;i<musicCursor.getCount();i++){
-				musicCursor.moveToPosition(i);
-				model = null;
-				model = new MusicModel();
-				model.set_id(musicCursor.getInt(0));
-				model.setTITLE(musicCursor.getString(1));
-				model.setDURATION(musicCursor.getString(2));
-				model.setARTIST(musicCursor.getString(3));
-				model.set_MusicID(musicCursor.getString(4));
-				model.setDISPLAY_NAME(musicCursor.getString(5));
-				model.setDATA(musicCursor.getString(6));
-				musicList.add(model);
-			}
-		}
-		dbAdapter.close();
+        if(MusicDBAdapter.musicList==null)
+        {
+        	MusicDBAdapter.LoadDataFromDB(this);
+        }
 		connectToMusicPlayerService();
 		bar = (SeekBar) findViewById(R.id.progressbar1);
 		startTime = (TextView) findViewById(R.id.textView1);
@@ -168,11 +167,14 @@ public class MainActivity extends Activity implements OnClickListener {
 				}
 			} else if (MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC.equals(action)) {
 				currentMusic = intent.getIntExtra(MusicPlyerService.ACTION_UPDATE_CURRENT_MUSIC, 0);
+				if (musicSampleBinder.isPlaying()) {
+					btnstartstop.setBackgroundResource(R.drawable.pause);
+				} 
 				
-				musicTitle.setText(musicList.get(currentMusic).getTITLE());
+				musicTitle.setText(MusicDBAdapter.musicList.get(currentMusic).getTITLE());
 				musicProcess = new MusicLrcProcess();  
 			        //读取歌词文件  
-				musicProcess.readLRC(musicList.get(currentMusic).getDATA(),musicList.get(currentMusic).getTITLE(),musicList.get(currentMusic).getARTIST());  
+				musicProcess.readLRC(MusicDBAdapter.musicList.get(currentMusic).getDATA(),MusicDBAdapter.musicList.get(currentMusic).getTITLE(),MusicDBAdapter.musicList.get(currentMusic).getARTIST());  
 			        //传回处理后的歌词文件  
 			        lrcList = musicProcess.getLrcList();  
 			        lrcView.setMusicLrcContent(lrcList);  

@@ -18,6 +18,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.bktmkd.music.MainActivity;
+import com.bktmkd.musicdb.MusicDBAdapter;
 import com.bktmkd.musicservice.MusicPlyerService;
 
 import android.os.AsyncTask;
@@ -25,10 +26,10 @@ import android.util.Log;
 import android.view.animation.AnimationUtils;
 
 public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
-
+        private boolean hasonlinelrc=false;
 	@Override
 	protected Boolean doInBackground(String... params) {
-		WriteLRC(params[0].toString(), params[1].toString(),params[2].toString());
+		hasonlinelrc=WriteLRC(params[0].toString(), params[1].toString(),params[2].toString());
 		return true;
 	}
 
@@ -42,13 +43,15 @@ public class MusicLrcOnLine extends AsyncTask<String,Integer,Boolean>{
 	@Override
 	protected void onPostExecute(Boolean result) {
 		super.onPostExecute(result);
+		if(hasonlinelrc){
 	MainActivity.musicProcess = new MusicLrcProcess();  
         //读取歌词文件  
-	MainActivity.musicProcess.readLRC(MainActivity.musicList.get(MainActivity.currentMusic).getDATA(),MainActivity.musicList.get(MainActivity.currentMusic).getTITLE(),MainActivity.musicList.get(MainActivity.currentMusic).getARTIST());  
+	MainActivity.musicProcess.readLRC(MusicDBAdapter.musicList.get(MainActivity.currentMusic).getDATA(),MusicDBAdapter.musicList.get(MainActivity.currentMusic).getTITLE(),MusicDBAdapter.musicList.get(MainActivity.currentMusic).getARTIST());  
         //传回处理后的歌词文件  
 	MainActivity.lrcList = MainActivity.musicProcess.getLrcList();  
 	MainActivity.lrcView.setMusicLrcContent(MainActivity.lrcList);  
         //切换带动画显示歌词  
+	}
 	}
 	private static MusicLrcOnLine instance;
 	public static final String queryLrcAPI = "http://geci.me/api/lyric/";
