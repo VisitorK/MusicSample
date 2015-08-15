@@ -51,17 +51,24 @@ public class MainActivity extends Activity implements OnClickListener {
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// TODO Auto-generated method stub
-		  menu.add(0, 1, 1, R.string.exit).setIcon(R.drawable.exit);  
+		  menu.add(0, 1, 1, R.string.list).setIcon(R.drawable.musicico);  
+		  menu.add(0, 2, 2, R.string.exit).setIcon(R.drawable.exit);  
+		
 		return super.onCreateOptionsMenu(menu);
 	}
 
 	@Override
 	public boolean onOptionsItemSelected(MenuItem item) {
 		// TODO Auto-generated method stub
-		if(item.getItemId()==1)
+		if(item.getItemId()==2)
 		{
 			musicSampleBinder.close();
 			this.finish();
+		}
+		if(item.getItemId()==1)
+		{
+			Intent intent = new Intent(MainActivity.this, MusicListActivity.class);
+			startActivity(intent);
 		}
 		return super.onOptionsItemSelected(item);
 	}
