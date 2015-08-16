@@ -18,12 +18,18 @@ public class MusicDBAdapter extends SQLiteOpenHelper {
 	private final static String CREATE_TBL = "create table music(_id integer primary key autoincrement, TITLE text, DURATION text, ARTIST text, _MusicID text,DISPLAY_NAME text,DATA text)";
 	private SQLiteDatabase db;
 	public static ArrayList<MusicModel> musicList;
+	public static Cursor musicCursor;
 
 	public static void LoadDataFromDB(Context context) {
 		musicList = new ArrayList<MusicModel>();
 		MusicDBAdapter dbAdapter = new MusicDBAdapter(context);
 		dbAdapter.getReadableDatabase();
-		Cursor musicCursor = dbAdapter.queryALL();
+		if(musicCursor!=null&&!musicCursor.isClosed())
+		{
+			musicCursor.close();
+		
+		}
+		musicCursor = dbAdapter.queryALL();
 		musicList.clear();
 		if (musicCursor.moveToFirst()) {
 			MusicModel model = new MusicModel();
@@ -49,7 +55,11 @@ public class MusicDBAdapter extends SQLiteOpenHelper {
 		MusicDBAdapter dbAdapter = new MusicDBAdapter(context);
 		dbAdapter.getReadableDatabase();
 		dbAdapter.deleteAll();
-		Cursor musicCursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+		if(musicCursor!=null&&!musicCursor.isClosed())
+		{
+			musicCursor.close();
+		}
+		musicCursor = context.getContentResolver().query(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
 				new String[] { MediaStore.Audio.Media.TITLE, MediaStore.Audio.Media.DURATION,
 						MediaStore.Audio.Media.ARTIST, MediaStore.Audio.Media._ID, MediaStore.Audio.Media.DISPLAY_NAME,
 						MediaStore.Audio.Media.DATA },

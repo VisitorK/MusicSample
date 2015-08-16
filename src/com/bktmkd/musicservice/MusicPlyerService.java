@@ -104,11 +104,12 @@ public class MusicPlyerService extends Service {
 	// service创建后执行
 	public void onCreate() {
 		initMediaPlayer();
-	if(MusicDBAdapter.musicList==null)
-	{
+
 		MusicDBAdapter.LoadDataFromDB(MusicPlyerService.this);
-		
-	}
+		if(MusicDBAdapter.musicList.size()==0)
+		{
+		MusicDBAdapter.RefreshData(MusicPlyerService.this);
+		}
 		Log.v(TAG, "OnCreate");
 		super.onCreate();
 
